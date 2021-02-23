@@ -19,8 +19,6 @@ jobs:
           - composer: 2
             php: 8.0
           - composer: 1
-            php: 7.2
-          - composer: 1
             php: 7.3
           - composer: 1
             php: 7.4

@@ -10,7 +10,8 @@
     }
   ],
   "require": {
-    "myclabs/php-enum": "^1.8"
+    "myclabs/php-enum": "^1.8",
+    "php": ">=7.3"
   },
   "autoload": {
     "psr-4": {
