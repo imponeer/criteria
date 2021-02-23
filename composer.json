@@ -1,0 +1,24 @@
+{
+  "name": "imponeer/criteria",
+  "description": "Small library for building database criteria strings",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Raimondas Rimkevičius",
+      "email": "github@mekdrop.name"
+    }
+  ],
+  "require": {
+    "myclabs/php-enum": "^1.8"
+  },
+  "autoload": {
+    "psr-4": {
+      "Imponeer\\Database\\Criteria\\": "src/"
+    }
+  },
+  "keywords": [
+    "database",
+    "criteria"
+  ]
+}
