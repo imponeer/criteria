@@ -22,5 +22,8 @@
     "database",
     "criteria",
     "xoops"
-  ]
+  ],
+  "require-dev": {
+    "phpunit/phpunit": "^9.5"
+  }
 }

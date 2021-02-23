@@ -64,7 +64,7 @@ class CriteriaItem extends CriteriaElement
             $this->operator = ComparisionOperator::from($operator);
         }
 
-        if (is_string($value) && strpos($this->value, '(') === 0) {
+        if (is_string($value) && strpos($value, '(') === 0) {
             $this->data = $value;
         } else {
             if (is_array($value) && in_array($this->operator->getValue(), [
@@ -92,7 +92,7 @@ class CriteriaItem extends CriteriaElement
     /**
      * @inheritDoc
      */
-    public function render(bool $withBindVariables = false)
+    public function render(bool $withBindVariables = false): ?string
     {
         if ($withBindVariables === false) {
             $withBindVariables = is_int($this->column) || // this is also for compatibility
