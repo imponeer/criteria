@@ -65,12 +65,20 @@ class CriteriaItemTest extends TestCase
     {
         $criteria = new CriteriaItem($column, $value, $operator);
         self::assertNotEmpty(
-            $criteria->render(),
-            'Criteria with condition ' . $operator->getKey() . ' doesn\'t renders SQL'
+            $criteria->render(false),
+            'Criteria with condition ' . $operator->getKey() . ' doesn\'t renders SQL (without binds)'
         );
         self::assertNotEmpty(
-            $criteria->renderWhere(),
-            'Criteria with condition ' . $operator->getKey() . ' doesn\'t renders WHERE SQL'
+            $criteria->renderWhere(false),
+            'Criteria with condition ' . $operator->getKey() . ' doesn\'t renders WHERE SQL (without binds)'
+        );
+        self::assertNotEmpty(
+            $criteria->render(true),
+            'Criteria with condition ' . $operator->getKey() . ' doesn\'t renders SQL (with binds)'
+        );
+        self::assertNotEmpty(
+            $criteria->renderWhere(true),
+            'Criteria with condition ' . $operator->getKey() . ' doesn\'t renders WHERE SQL (with binds)'
         );
     }
 
@@ -86,13 +94,22 @@ class CriteriaItemTest extends TestCase
     public function testIfOperatorRendersContentAsString(string $column, $value, ComparisionOperator $operator)
     {
         $criteria = new CriteriaItem($column, $value, $operator->getValue());
+
         self::assertNotEmpty(
-            $criteria->render(),
-            'Criteria with condition ' . $operator->getValue() . ' doesn\'t renders SQL'
+            $criteria->render(false),
+            'Criteria with condition ' . $operator->getValue() . ' doesn\'t renders SQL (without binds)'
         );
         self::assertNotEmpty(
-            $criteria->renderWhere(),
-            'Criteria with condition ' . $operator->getValue() . ' doesn\'t renders WHERE SQL'
+            $criteria->renderWhere(false),
+            'Criteria with condition ' . $operator->getValue() . ' doesn\'t renders WHERE SQL (without binds)'
+        );
+        self::assertNotEmpty(
+            $criteria->render(true),
+            'Criteria with condition ' . $operator->getValue() . ' doesn\'t renders SQL (with binds)'
+        );
+        self::assertNotEmpty(
+            $criteria->renderWhere(true),
+            'Criteria with condition ' . $operator->getValue() . ' doesn\'t renders WHERE SQL (with binds)'
         );
     }
 

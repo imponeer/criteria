@@ -162,7 +162,15 @@ class CriteriaItem extends CriteriaElement
         }
 
         if (is_object($value)) {
-            return $this->addSlashes((string)$value);
+            if (method_exists($value, '__toString') || (interface_exists('\\Stringable') && ($value instanceof \Stringable))) {
+                return $this->addSlashes((string)$value);
+            }
+
+            return $this->addSlashes(serialize($value));
+        }
+
+        if (is_array($value)) {
+            return json_encode($value);
         }
 
         if ($value === '') {
