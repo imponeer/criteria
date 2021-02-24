@@ -32,7 +32,7 @@ final class UniqueBindParam
      */
     public static function generate(string $column): string
     {
-        return $column . '_' . (++self::$lastGeneratedBindSuffixId);
+        return 'col_' . $column . '_' . (++self::$lastGeneratedBindSuffixId);
     }
 
 }

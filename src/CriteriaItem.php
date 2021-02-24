@@ -97,7 +97,7 @@ class CriteriaItem extends CriteriaElement
     {
         if ($withBindVariables === false) {
             $withBindVariables = is_int($this->column) || // this is also for compatibility
-                is_string($this->data) // strpos is a hack to make old code still run
+                is_string($this->data) // str_pos is a hack to make old code still run
             ;
         }
 
@@ -125,7 +125,10 @@ class CriteriaItem extends CriteriaElement
             case ComparisionOperator::NOT_IN:
                 $clause .= ' ' . $this->operator . '(';
                 if ($withBindVariables) {
-                    foreach ($this->data as $value) {
+                    foreach (array_values($this->data) as $i => $value) {
+                        if ($i !== 0) {
+                            $clause .= ', ';
+                        }
                         $clause .= $this->prepareRenderedValue($value);
                     }
                 } else {
@@ -139,7 +142,11 @@ class CriteriaItem extends CriteriaElement
                 $clause .= ')';
                 break;
             default:
-                $clause .= sprintf(" %s %s", $this->operator, key($this->data));
+                if ($withBindVariables) {
+                    $clause .= sprintf(" %s %s", $this->operator, $this->prepareRenderedValue(current($this->data)));
+                } else {
+                    $clause .= sprintf(" %s :%s", $this->operator, key($this->data));
+                }
         }
 
         return $clause;
@@ -194,7 +201,7 @@ class CriteriaItem extends CriteriaElement
      */
     protected function addSlashes(string $str): string
     {
-        return str_replace(['\\', '\''], ['\\\\', '\\\''], $str);
+        return "'" . str_replace(['\\', '\''], ['\\\\', '\\\''], $str) . "'";
     }
 
     /**

@@ -19,15 +19,15 @@ class CriteriaCompo extends CriteriaElement implements \IteratorAggregate
     /**
      * Constructor
      *
-     * @param object $ele
-     * @param string $condition
+     * @param CriteriaElement|null $criteria Criteria element to add at start
+     * @param string $condition Join condition
      */
-    public function __construct($ele = null, $condition = 'AND')
+    public function __construct(?CriteriaElement $criteria = null, $condition = 'AND')
     {
         parent::__construct();
 
-        if ($ele instanceof CriteriaElement) {
-            $this->add($ele, $condition);
+        if ($criteria instanceof CriteriaElement) {
+            $this->add($criteria, $condition);
         }
     }
 
@@ -39,11 +39,12 @@ class CriteriaCompo extends CriteriaElement implements \IteratorAggregate
      *
      * @return $this
      */
-    public function add(CriteriaElement $criteriaElement, $condition = 'AND')
+    public function add(CriteriaElement $criteriaElement, $condition = 'AND'): self
     {
         if ($condition instanceof Condition) {
             $this->elements[] = [$criteriaElement, $condition];
         } else {
+            $condition = strtoupper($condition);
             Condition::assertValidValue($condition);
             $this->elements[] = [$criteriaElement, Condition::from($condition)];
         }

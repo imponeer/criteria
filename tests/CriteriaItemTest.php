@@ -1,10 +1,12 @@
 <?php
 
+namespace Imponeer\Tests\Database\Criteria;
+
 use Imponeer\Database\Criteria\CriteriaItem;
 use Imponeer\Database\Criteria\Enum\ComparisionOperator;
 use Imponeer\Database\Criteria\Enum\Order;
-use Imponeer\Tests\Database\Criteria\Helpers\UniqueBindParam;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class CriteriaItemTest extends TestCase
 {
