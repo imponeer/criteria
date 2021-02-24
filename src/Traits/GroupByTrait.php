@@ -15,25 +15,11 @@ trait GroupByTrait
     protected $group = null;
 
     /**
-     * Adds Xoops like calls compatibility
+     * Sets group by
      *
-     * @param string $name Function name
-     * @param array $arguments Arguments array
-     *
-     * @return GroupByTrait|string
-     */
-    public function __call($name, $arguments)
-    {
-        switch ($name) {
-            case 'setGroupby':
-                return $this->setGroupBy($arguments[0]);
-            case 'getGroupby':
-                return $this->getGroupBy();
-        }
-    }
-
-    /**
      * @param string $group
+     *
+     * @return self
      */
     public function setGroupBy($group): self
     {

@@ -22,7 +22,7 @@ trait SortByTrait
      */
     public function getSort(): string
     {
-        return $this->sort;
+        return (string)$this->sort;
     }
 
     /**
@@ -32,7 +32,7 @@ trait SortByTrait
      *
      * @return self
      */
-    public function setSort($sort): self
+    public function setSort(?string $sort): self
     {
         $this->sort = $sort;
 

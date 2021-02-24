@@ -121,8 +121,54 @@ class CriteriaItemTest extends TestCase
     public function testOrder($order)
     {
         $criteria = new CriteriaItem(sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX)));
+        self::assertSame(Order::ASC()->getValue(), (string)$criteria->getOrder(), 'Default order is not correct');
         $criteria->setOrder($order);
         self::assertSame(strtoupper($order), (string)$criteria->getOrder(), 'Order ' . $order . ' does\'t sets');
+    }
+
+    /**
+     * Tests group by operations
+     */
+    public function testGroupBy()
+    {
+        $criteria = new CriteriaItem(sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX)));
+        self::assertEmpty($criteria->getGroupBy(), 'Default group by is not empty');
+        $groupBy = sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX));
+        $criteria->setGroupBy($groupBy);
+        self::assertNotEmpty($criteria->getGroupBy(), 'Group by was set but value wasn\'t modified');
+        self::assertStringStartsWith('GROUP BY', trim($criteria->getGroupBy()), 'Non empty group by doesn\' starts with "GROUP BY"');
+        self::assertStringContainsString($groupBy, $criteria->getGroupBy(), 'Group by value doesn\'t exists');
+    }
+
+    /**
+     * Tests sort by operations
+     */
+    public function testSortBy()
+    {
+        $criteria = new CriteriaItem(sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX)));
+        self::assertEmpty($criteria->getSort(), 'Default sort by is not empty');
+        $sort = sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX));
+        $criteria->setSort($sort);
+        self::assertNotEmpty($criteria->getSort(), 'Sort by was set but value wasn\'t modified');
+        self::assertStringContainsString($sort, $criteria->getSort(), 'Sort by value doesn\'t exists');
+    }
+
+    /**
+     * Tests limit/from by operations
+     */
+    public function testPartialResults()
+    {
+        $criteria = new CriteriaItem(sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX)));
+        self::assertSame(0, $criteria->getLimit(), 'Default limit is not 0');
+        self::assertSame(0, $criteria->getStart(), 'Default start is not 0');
+        $limit = mt_rand(1, PHP_INT_MAX);
+        $start = mt_rand(1, PHP_INT_MAX);
+        $criteria->setLimit($limit)->setStart($start);
+        self::assertSame($limit, $criteria->getLimit(), 'Updated limit is not same as should be');
+        self::assertSame($start, $criteria->getStart(), 'Updated start is not same as should be');
+        $criteria->setLimit()->setStart();
+        self::assertSame(0, $criteria->getLimit(), 'Reset limit is not 0');
+        self::assertSame(0, $criteria->getStart(), 'Reset start is not 0');
     }
 
 }
