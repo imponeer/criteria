@@ -46,11 +46,12 @@ trait OrderByTrait
      */
     public function setOrder($order): self
     {
-        if (!($order instanceof Order)) {
+        if ($order instanceof Order) {
+            $this->order = $order;
+        } else {
+            $order = strtoupper($order);
             Order::assertValidValue($order);
             $this->order = Order::from($order);
-        } else {
-            $this->order = $order;
         }
 
         return $this;
