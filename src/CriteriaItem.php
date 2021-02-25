@@ -123,6 +123,10 @@ class CriteriaItem extends CriteriaElement
                 break;
             case ComparisionOperator::IN:
             case ComparisionOperator::NOT_IN:
+                if (empty($this->data)) {
+                    $clause .= ' ' . ($this->operator->getValue() === ComparisionOperator::IN ? ' IS 0 ' : ' IS 1 ');
+                    break;
+                }
                 $clause .= ' ' . $this->operator . '(';
                 if ($withBindVariables) {
                     foreach (array_values($this->data) as $i => $value) {
