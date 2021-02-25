@@ -49,7 +49,7 @@ trait OrderByTrait
         if ($order instanceof Order) {
             $this->order = $order;
         } else {
-            $order = strtoupper($order);
+            $order = strtoupper(trim($order));
             Order::assertValidValue($order);
             $this->order = Order::from($order);
         }

@@ -43,6 +43,7 @@ class CriteriaItemTest extends TestCase
             foreach ($possibleValues as $value) {
                 yield [$column, $value, $operatorEnum];
                 yield [$column, $value, $operatorVal];
+                yield [$column, $value, ' ' . $operatorVal . ' '];
                 if (strtolower($operatorVal) !== $operatorVal) {
                     yield [$column, $value, strtolower($operatorVal)];
                     yield [$column, $value, ucfirst(strtolower($operatorVal))];
@@ -54,6 +55,7 @@ class CriteriaItemTest extends TestCase
             yield [$column, [mt_rand(PHP_INT_MIN, 0), mt_rand(1, PHP_INT_MAX)], $operatorEnum];
             $operatorVal = $operatorEnum->getValue();
             yield [$column, [mt_rand(PHP_INT_MIN, 0), mt_rand(1, PHP_INT_MAX)], $operatorVal];
+            yield [$column, [mt_rand(PHP_INT_MIN, 0), mt_rand(1, PHP_INT_MAX)], ' ' . $operatorVal . ' '];
             yield [$column, [mt_rand(PHP_INT_MIN, 0), mt_rand(1, PHP_INT_MAX)], strtolower($operatorVal)];
             yield [$column, [mt_rand(PHP_INT_MIN, 0), mt_rand(1, PHP_INT_MAX)], ucfirst(strtolower($operatorVal))];
         }
@@ -63,6 +65,7 @@ class CriteriaItemTest extends TestCase
                 yield [$column, array_fill(0, mt_rand(1, 100), $value), $operatorEnum];
                 $operatorVal = $operatorEnum->getValue();
                 yield [$column, array_fill(0, mt_rand(1, 100), $value), $operatorVal];
+                yield [$column, array_fill(0, mt_rand(1, 100), $value), ' ' . $operatorVal . ' '];
                 yield [$column, array_fill(0, mt_rand(1, 100), $value), strtolower($operatorVal)];
                 yield [$column, array_fill(0, mt_rand(1, 100), $value), ucfirst(strtolower($operatorVal))];
             }
@@ -110,6 +113,7 @@ class CriteriaItemTest extends TestCase
             yield [$order];
             yield [strtolower($order)];
             yield [ucfirst(strtolower($order))];
+            yield [' ' . $order . ' '];
         }
     }
 
@@ -125,7 +129,7 @@ class CriteriaItemTest extends TestCase
         $criteria = new CriteriaItem(sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX)));
         self::assertSame(Order::ASC()->getValue(), (string)$criteria->getOrder(), 'Default order is not correct');
         $criteria->setOrder($order);
-        self::assertSame(strtoupper($order), (string)$criteria->getOrder(), 'Order ' . $order . ' does\'t sets');
+        self::assertSame(strtoupper(trim($order)), (string)$criteria->getOrder(), 'Order ' . $order . ' does\'t sets');
     }
 
     /**

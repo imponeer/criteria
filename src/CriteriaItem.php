@@ -60,7 +60,7 @@ class CriteriaItem extends CriteriaElement
         if ($operator instanceof ComparisionOperator) {
             $this->operator = $operator;
         } else {
-            $operator = strtoupper($operator);
+            $operator = strtoupper(trim($operator));
             ComparisionOperator::assertValidValue($operator);
             $this->operator = ComparisionOperator::from($operator);
         }

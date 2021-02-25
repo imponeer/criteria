@@ -19,7 +19,7 @@ class CriteriaCompoTest extends TestCase
     public function provideCondition()
     {
         foreach (Condition::values() as $condition) {
-            foreach ([$condition, strtolower($condition), ucfirst(strtolower($condition))] as $conditionVar) {
+            foreach ([$condition, ' ' . $condition . ' ', strtolower($condition), ucfirst(strtolower($condition))] as $conditionVar) {
                 // first variant for compo
                 $compo1 = new CriteriaCompo();
                 $compo1->add(new CriteriaItem(sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX))));
@@ -71,7 +71,6 @@ class CriteriaCompoTest extends TestCase
             $compo->renderWhere(true),
             'Criteria with condition ' . $condition . ' doesn\'t renders WHERE SQL (with binds)'
         );
-        //var_dump($compo->renderWhere(true));
     }
 
     /**
@@ -98,6 +97,7 @@ class CriteriaCompoTest extends TestCase
             yield [$order];
             yield [strtolower($order)];
             yield [ucfirst(strtolower($order))];
+            yield [' ' . $order . ' '];
         }
     }
 
@@ -113,7 +113,7 @@ class CriteriaCompoTest extends TestCase
         $criteria = new CriteriaCompo();
         self::assertSame(Order::ASC()->getValue(), (string)$criteria->getOrder(), 'Default order is not correct');
         $criteria->setOrder($order);
-        self::assertSame(strtoupper($order), (string)$criteria->getOrder(), 'Order ' . $order . ' does\'t sets');
+        self::assertSame(strtoupper(trim($order)), (string)$criteria->getOrder(), 'Order ' . $order . ' does\'t sets');
     }
 
     /**

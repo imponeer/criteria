@@ -44,7 +44,7 @@ class CriteriaCompo extends CriteriaElement implements \IteratorAggregate
         if ($condition instanceof Condition) {
             $this->elements[] = [$criteriaElement, $condition];
         } else {
-            $condition = strtoupper($condition);
+            $condition = strtoupper(trim($condition));
             Condition::assertValidValue($condition);
             $this->elements[] = [$criteriaElement, Condition::from($condition)];
         }
