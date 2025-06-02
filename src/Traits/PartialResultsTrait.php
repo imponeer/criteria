@@ -16,8 +16,8 @@ trait PartialResultsTrait
     /**
      * Gets how many results to return
      *
-     * @return    int
-     */
+     * @noinspection MethodShouldBeFinalInspection
+     **/
     public function getLimit(): int
     {
         return $this->limit;
@@ -28,7 +28,7 @@ trait PartialResultsTrait
      *
      * @param int $limit Limit for results
      *
-     * @return self
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function setLimit(int $limit = 0): self
     {
@@ -40,7 +40,8 @@ trait PartialResultsTrait
     /**
      * Gets from what record number to return results (counting starts from 0)
      *
-     * @return    int
+     * @noinspection MethodShouldBeFinalInspection
+     * @noinspection PhpDocSignatureInspection
      */
     public function getStart(): int
     {
@@ -52,7 +53,8 @@ trait PartialResultsTrait
      *
      * @param int $start Sets start position
      *
-     * @return self
+     * @noinspection MethodShouldBeFinalInspection
+     * @noinspection PhpDocSignatureInspection
      */
     public function setStart(int $start = 0): self
     {

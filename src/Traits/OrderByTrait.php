@@ -12,23 +12,15 @@ use Imponeer\Database\Criteria\Enum\Order;
 trait OrderByTrait
 {
 
-    /**
-     * Sort order
-     */
     protected Order $order;
 
-    /**
-     * OrderByTrait constructor.
-     */
     public function __construct()
     {
         $this->order = Order::ASC;
     }
 
     /**
-     * Gets order
-     *
-     * @return    Order
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function getOrder(): Order
     {
@@ -40,7 +32,7 @@ trait OrderByTrait
      *
      * @param string|Order $order Order to set for this criteria element
      *
-     * @return self
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function setOrder(Order|string $order): self
     {

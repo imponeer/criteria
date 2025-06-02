@@ -14,9 +14,8 @@ trait GroupByTrait
     /**
      * Sets group by
      *
-     * @param string $group
-     *
-     * @return self
+     * @noinspection MethodShouldBeFinalInspection
+     * @noinspection PhpDocSignatureInspection
      */
     public function setGroupBy(string $group): self
     {
@@ -28,7 +27,7 @@ trait GroupByTrait
     /**
      * Gets a group by value
      *
-     * @return    string
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function getGroupBy(): string
     {

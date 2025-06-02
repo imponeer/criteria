@@ -19,7 +19,7 @@ class CriteriaCompoTest extends TestCase
      * @return Generator
      * @throws RandomException
      */
-    public function provideCondition()
+    final public function provideCondition(): Generator
     {
         foreach (Condition::cases() as $conditionData) {
             $condition = $conditionData->value;
@@ -59,7 +59,7 @@ class CriteriaCompoTest extends TestCase
      *
      * @throws Exception
      */
-    public function testCondition(CriteriaCompo $compo, string|Condition $condition): void
+    final public function testCondition(CriteriaCompo $compo, string|Condition $condition): void
     {
         if (is_string($condition)) {
             $condition = Condition::from(strtoupper(trim($condition)));
@@ -88,7 +88,7 @@ class CriteriaCompoTest extends TestCase
      *
      * @throws Exception
      */
-    public function testEmptyRender(): void
+    final public function testEmptyRender(): void
     {
         $criteria = new CriteriaCompo();
         self::assertEmpty($criteria->render(false), 'Should render empty string (without binding)');
@@ -103,7 +103,7 @@ class CriteriaCompoTest extends TestCase
      *
      * @return Generator
      */
-    public function provideOrder(): Generator
+    final public function provideOrder(): Generator
     {
         foreach (Order::cases() as $order) {
             yield [$order->value];
@@ -120,7 +120,7 @@ class CriteriaCompoTest extends TestCase
      *
      * @dataProvider provideOrder
      */
-    public function testOrder(Order|string $order): void
+    final public function testOrder(Order|string $order): void
     {
         $criteria = new CriteriaCompo();
         self::assertSame(Order::ASC->value, $criteria->getOrder()->value, 'Default order is not correct');
@@ -133,7 +133,7 @@ class CriteriaCompoTest extends TestCase
      *
      * @throws RandomException
      */
-    public function testGroupBy()
+    final public function testGroupBy(): void
     {
         $criteria = new CriteriaCompo();
         self::assertEmpty($criteria->getGroupBy(), 'Default group by is not empty');
@@ -149,7 +149,7 @@ class CriteriaCompoTest extends TestCase
      *
      * @throws RandomException
      */
-    public function testSortBy(): void
+    final public function testSortBy(): void
     {
         $criteria = new CriteriaCompo();
         self::assertEmpty($criteria->getSort(), 'Default sort by is not empty');
@@ -164,7 +164,7 @@ class CriteriaCompoTest extends TestCase
      *
      * @throws RandomException
      */
-    public function testPartialResults(): void
+    final public function testPartialResults(): void
     {
         $criteria = new CriteriaCompo();
         self::assertSame(0, $criteria->getLimit(), 'Default limit is not 0');

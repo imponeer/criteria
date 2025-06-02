@@ -2,7 +2,7 @@
 
 namespace Imponeer\Database\Criteria;
 
-use Imponeer\Database\Criteria\Enum\ComparisionOperator;
+use Imponeer\Database\Criteria\Enum\ComparisonOperator;
 use Imponeer\Database\Criteria\Enum\Order;
 use Imponeer\Database\Criteria\Helpers\UniqueBindParam;
 use JsonException;
@@ -19,8 +19,8 @@ class CriteriaItem extends CriteriaElement
 
     protected ?string $prefix = null;
     protected ?string $function = null;
-    protected ?string $column = null;
-    protected ComparisionOperator $operator;
+    protected null|string|int $column = null;
+    protected ComparisonOperator $operator;
 
     /**
      * Data for criteria item
@@ -32,18 +32,18 @@ class CriteriaItem extends CriteriaElement
     /**
      * Constructor
      *
-     * @param string $column
+     * @param string|int $column
      * @param mixed|null $value
-     * @param ComparisionOperator|string $operator
+     * @param ComparisonOperator|string $operator
      * @param string|null $prefix
      * @param string|null $function
      */
     public function __construct(
-        string $column,
-        mixed $value = null,
-        ComparisionOperator|string $operator = '=',
-        ?string $prefix = null,
-        ?string $function = null
+        string|int                $column,
+        mixed                     $value = null,
+        ComparisonOperator|string $operator = '=',
+        ?string                   $prefix = null,
+        ?string                   $function = null
     )
     {
         parent::__construct();
@@ -51,18 +51,13 @@ class CriteriaItem extends CriteriaElement
         $this->prefix = $prefix;
         $this->function = $function;
         $this->column = $column;
-        $this->operator = $operator instanceof ComparisionOperator ? $operator : ComparisionOperator::from(strtoupper(trim($operator)));
+        $this->operator = $operator instanceof ComparisonOperator ? $operator : ComparisonOperator::from(strtoupper(trim($operator)));
 
         if (is_string($value) && str_starts_with($value, '(')) {
             $this->data[] = $value;
         } else {
-            if (is_array($value) && in_array($this->operator->value, [
-                    ComparisionOperator::IS_NOT_NULL,
-                    ComparisionOperator::IS_NULL,
-                    ComparisionOperator::BETWEEN,
-                    ComparisionOperator::NOT_BETWEEN,
-                ], true)) {
-                $this->operator = ComparisionOperator::IS_NULL;
+            if ($this->isEmptyArrayButNotNullComparison($value)) {
+                $this->operator = ComparisonOperator::IS_NULL;
             }
 
             if (is_array($value)) {
@@ -78,20 +73,25 @@ class CriteriaItem extends CriteriaElement
         }
     }
 
-    public function getComparisionOperator(): ComparisionOperator
+    /**
+     * @noinspection MethodShouldBeFinalInspection
+     */
+    public function getComparisonOperator(): ComparisonOperator
     {
         return $this->operator;
     }
 
     /**
      * @inheritDoc
+     *
+     * @throws JsonException
+     *
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function render(bool $withBindVariables = false): ?string
     {
         if ($withBindVariables === false) {
-            $withBindVariables = is_int($this->column) || // this is also for compatibility
-                is_string($this->data) // str_pos is a hack to make old code still run
-            ;
+            $withBindVariables = is_int($this->column); // this is also for compatibility
         }
 
         $clause = sprintf("%s%s", $this->prefix ? $this->prefix . "." : '', $this->column);
@@ -100,12 +100,12 @@ class CriteriaItem extends CriteriaElement
         }
 
         switch ($this->operator->value) {
-            case ComparisionOperator::IS_NOT_NULL:
-            case ComparisionOperator::IS_NULL:
+            case ComparisonOperator::IS_NOT_NULL:
+            case ComparisonOperator::IS_NULL:
                 $clause .= ' ' . $this->operator->value;
                 break;
-            case ComparisionOperator::BETWEEN:
-            case ComparisionOperator::NOT_BETWEEN:
+            case ComparisonOperator::BETWEEN:
+            case ComparisonOperator::NOT_BETWEEN:
                 if ($withBindVariables) {
                     [$fromValue, $toValue] = array_keys($this->data);
                     $clause .= sprintf(" %s %d AND %d", $this->operator->value, (int)$fromValue, (int)$toValue);
@@ -114,14 +114,10 @@ class CriteriaItem extends CriteriaElement
                     $clause .= sprintf(" %s :%s AND :%s", $this->operator->value, $fromKey, $toKey);
                 }
                 break;
-            case ComparisionOperator::IN:
-            case ComparisionOperator::NOT_IN:
-                if (is_string($this->data)) {
-                    $clause .= ' ' . $this->operator->value . $this->data;
-                    break;
-                }
+            case ComparisonOperator::IN:
+            case ComparisonOperator::NOT_IN:
                 if (empty($this->data)) {
-                    $clause .= ' ' . ($this->operator === ComparisionOperator::IN ? ' IS 0 ' : ' IS 1 ');
+                    $clause .= ' ' . ($this->operator === ComparisonOperator::IN ? ' IS 0 ' : ' IS 1 ');
                     break;
                 }
                 $clause .= ' ' . $this->operator->value . '(';
@@ -161,8 +157,11 @@ class CriteriaItem extends CriteriaElement
      * @return string
      *
      * @throws JsonException
+     *
+     * @noinspection MethodVisibilityInspection
+     * @noinspection MethodShouldBeFinalInspection
      */
-    protected function prepareRenderedValue(null|bool|object|string|float|array $value)
+    protected function prepareRenderedValue(null|bool|object|string|float|array $value): string
     {
         if ($value === null) {
             return 'NULL';
@@ -200,7 +199,8 @@ class CriteriaItem extends CriteriaElement
      *
      * @param string $str String where to add slashes
      *
-     * @return string
+     * @noinspection MethodVisibilityInspection
+     * @noinspection MethodShouldBeFinalInspection
      */
     protected function addSlashes(string $str): string
     {
@@ -209,9 +209,21 @@ class CriteriaItem extends CriteriaElement
 
     /**
      * @inheritDoc
+     *
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function getBindData(): array
     {
         return $this->data;
+    }
+
+    private function isEmptyArrayButNotNullComparison(mixed $value): bool
+    {
+        return is_array($value) && empty($value) && in_array($this->operator->value, [
+                ComparisonOperator::IS_NOT_NULL,
+                ComparisonOperator::IS_NULL,
+                ComparisonOperator::BETWEEN,
+                ComparisonOperator::NOT_BETWEEN,
+            ], true);
     }
 }

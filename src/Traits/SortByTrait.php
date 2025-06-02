@@ -2,8 +2,6 @@
 
 namespace Imponeer\Database\Criteria\Traits;
 
-use Imponeer\Database\Criteria\CriteriaElement;
-
 /**
  * Trait for setting fields for sorting results
  *
@@ -17,7 +15,7 @@ trait SortByTrait
     /**
      * Gets sort field
      *
-     * @return    string
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function getSort(): string
     {
@@ -29,7 +27,7 @@ trait SortByTrait
      *
      * @param string|null $sort Database field name for sorting
      *
-     * @return SortByTrait|CriteriaElement
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function setSort(?string $sort): self
     {

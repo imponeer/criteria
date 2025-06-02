@@ -4,8 +4,9 @@ namespace Imponeer\Tests\Database\Criteria;
 
 use Generator;
 use Imponeer\Database\Criteria\CriteriaItem;
-use Imponeer\Database\Criteria\Enum\ComparisionOperator;
+use Imponeer\Database\Criteria\Enum\ComparisonOperator;
 use Imponeer\Database\Criteria\Enum\Order;
+use JsonException;
 use PHPUnit\Framework\TestCase;
 use Random\RandomException;
 use stdClass;
@@ -19,14 +20,14 @@ class CriteriaItemTest extends TestCase
      * @return Generator
      * @throws RandomException
      */
-    public function provideComparisionOperators(): Generator
+    final public function provideComparisionOperators(): Generator
     {
         $column = sha1(random_int(PHP_INT_MIN, PHP_INT_MAX));
         $specialOperators = [
-            ComparisionOperator::BETWEEN->name,
-            ComparisionOperator::NOT_BETWEEN->name,
-            ComparisionOperator::IN->name,
-            ComparisionOperator::NOT_IN->name,
+            ComparisonOperator::BETWEEN->name,
+            ComparisonOperator::NOT_BETWEEN->name,
+            ComparisonOperator::IN->name,
+            ComparisonOperator::NOT_IN->name,
         ];
         $possibleValues = [
             null,  // null value
@@ -38,7 +39,7 @@ class CriteriaItemTest extends TestCase
             new stdClass(), // class
         ];
 
-        foreach (ComparisionOperator::cases() as $operatorEnum) {
+        foreach (ComparisonOperator::cases() as $operatorEnum) {
             if (in_array($operatorEnum->name, $specialOperators, true)) {
                 continue;
             }
@@ -54,7 +55,7 @@ class CriteriaItemTest extends TestCase
             }
         }
 
-        foreach ([ComparisionOperator::BETWEEN, ComparisionOperator::NOT_BETWEEN] as $operatorEnum) {
+        foreach ([ComparisonOperator::BETWEEN, ComparisonOperator::NOT_BETWEEN] as $operatorEnum) {
             yield [$column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], $operatorEnum];
             $operatorVal = $operatorEnum->value;
             yield [$column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], $operatorVal];
@@ -63,7 +64,7 @@ class CriteriaItemTest extends TestCase
             yield [$column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], ucfirst(strtolower($operatorVal))];
         }
 
-        foreach ([ComparisionOperator::IN, ComparisionOperator::NOT_IN] as $operatorEnum) {
+        foreach ([ComparisonOperator::IN, ComparisonOperator::NOT_IN] as $operatorEnum) {
             foreach ($possibleValues as $value) {
                 yield [$column, array_fill(0, random_int(1, 100), $value), $operatorEnum];
                 $operatorVal = $operatorEnum->value;
@@ -80,28 +81,30 @@ class CriteriaItemTest extends TestCase
      *
      * @param string $column Column name
      * @param mixed $value Value to use
-     * @param string|ComparisionOperator $operator Comparison operator to be used for test
+     * @param string|ComparisonOperator $operator Comparison operator to be used for test
      *
      * @dataProvider provideComparisionOperators
+     *
+     * @throws JsonException
      */
-    public function testIfOperatorRendersContent(string $column, mixed $value, ComparisionOperator|string $operator): void
+    final public function testIfOperatorRendersContent(string $column, mixed $value, ComparisonOperator|string $operator): void
     {
         $criteria = new CriteriaItem($column, $value, $operator);
         self::assertNotEmpty(
             $criteria->render(false),
-            'Criteria with condition ' . $criteria->getComparisionOperator()->name . ' doesn\'t renders SQL (without binds)'
+            'Criteria with condition ' . $criteria->getComparisonOperator()->name . ' doesn\'t renders SQL (without binds)'
         );
         self::assertNotEmpty(
             $criteria->renderWhere(false),
-            'Criteria with condition ' . $criteria->getComparisionOperator()->name . ' doesn\'t renders WHERE SQL (without binds)'
+            'Criteria with condition ' . $criteria->getComparisonOperator()->name . ' doesn\'t renders WHERE SQL (without binds)'
         );
         self::assertNotEmpty(
             $criteria->render(true),
-            'Criteria with condition ' . $criteria->getComparisionOperator()->name . ' doesn\'t renders SQL (with binds)'
+            'Criteria with condition ' . $criteria->getComparisonOperator()->name . ' doesn\'t renders SQL (with binds)'
         );
         self::assertNotEmpty(
             $criteria->renderWhere(true),
-            'Criteria with condition ' . $criteria->getComparisionOperator()->name . ' doesn\'t renders WHERE SQL (with binds)'
+            'Criteria with condition ' . $criteria->getComparisonOperator()->name . ' doesn\'t renders WHERE SQL (with binds)'
         );
     }
 
@@ -110,7 +113,7 @@ class CriteriaItemTest extends TestCase
      *
      * @return Generator
      */
-    public function provideOrder(): Generator
+    final public function provideOrder(): Generator
     {
         foreach (Order::cases() as $order) {
             yield [$order->value];
@@ -129,7 +132,7 @@ class CriteriaItemTest extends TestCase
      *
      * @throws RandomException
      */
-    public function testOrder(Order|string $order): void
+    final public function testOrder(Order|string $order): void
     {
         $criteria = new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX)));
         self::assertSame(Order::ASC->value, $criteria->getOrder()->value, 'Default order is not correct');
@@ -142,7 +145,7 @@ class CriteriaItemTest extends TestCase
      *
      * @throws RandomException
      */
-    public function testGroupBy(): void
+    final public function testGroupBy(): void
     {
         $criteria = new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX)));
         self::assertEmpty($criteria->getGroupBy(), 'Default group by is not empty');
@@ -157,7 +160,7 @@ class CriteriaItemTest extends TestCase
      * Tests sort by operations
      * @throws RandomException
      */
-    public function testSortBy(): void
+    final public function testSortBy(): void
     {
         $criteria = new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX)));
         self::assertEmpty($criteria->getSort(), 'Default sort by is not empty');
@@ -171,7 +174,7 @@ class CriteriaItemTest extends TestCase
      * Tests limit/from by operations
      * @throws RandomException
      */
-    public function testPartialResults(): void
+    final public function testPartialResults(): void
     {
         $criteria = new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX)));
         self::assertSame(0, $criteria->getLimit(), 'Default limit is not 0');

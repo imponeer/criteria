@@ -4,6 +4,7 @@ namespace Imponeer\Database\Criteria;
 
 use Exception;
 use Imponeer\Database\Criteria\Enum\Condition;
+use IteratorAggregate;
 use Traversable;
 
 /**
@@ -11,10 +12,10 @@ use Traversable;
  *
  * @package Imponeer\Database\Criteria
  */
-class CriteriaCompo extends CriteriaElement implements \IteratorAggregate
+class CriteriaCompo extends CriteriaElement implements IteratorAggregate
 {
     /**
-     * @var array<CriteriaElement,string>[]
+     * @var array<array{0: CriteriaElement, 1: Condition}>
      */
     protected array $elements = [];
 
@@ -40,6 +41,8 @@ class CriteriaCompo extends CriteriaElement implements \IteratorAggregate
      * @param string|Condition $condition Condition
      *
      * @return $this
+     *
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function add(CriteriaElement $criteriaElement, Condition|string $condition = Condition::AND): self
     {
@@ -55,6 +58,8 @@ class CriteriaCompo extends CriteriaElement implements \IteratorAggregate
      * @inheritDoc
      *
      * @throws Exception
+     *
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function getBindData(): array
     {
@@ -71,6 +76,8 @@ class CriteriaCompo extends CriteriaElement implements \IteratorAggregate
      * @inheritDoc
      *
      * @return Traversable<string, CriteriaElement>
+     *
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function getIterator(): Traversable
     {
@@ -83,6 +90,8 @@ class CriteriaCompo extends CriteriaElement implements \IteratorAggregate
      * @inheritDoc
      *
      * @throws Exception
+     *
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function render(bool $withBindVariables = false): ?string
     {

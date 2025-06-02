@@ -25,8 +25,6 @@ final class UniqueBindParam
      * Generates unique bind name from column name
      *
      * @param string $column Column name
-     *
-     * @return string
      */
     public static function generate(string $column): string
     {

@@ -7,7 +7,7 @@ namespace Imponeer\Database\Criteria\Enum;
  *
  * @package Imponeer\Database\Criteria\Enum
  */
-enum ComparisionOperator: string
+enum ComparisonOperator: string
 {
 
     /**

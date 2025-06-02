@@ -28,12 +28,8 @@ abstract class CriteriaElement
     /**
      * For compatibility. Probably will be removed in feature
      * Gets variable value
-     *
-     * @param string $name Variable name
-     *
-     * @return mixed
      */
-    public function __get(string $name): mixed
+    public function __get(string $name): string|int
     {
         return match ($name) {
             'order' => $this->getOrder()->value,
@@ -46,15 +42,10 @@ abstract class CriteriaElement
     }
 
     /**
-     * For compatibility. Probably will be removed in feature
+     * For compatibility. Probably will be removed in the feature
      * Sets variable
-     *
-     * @param string $name Variable name
-     * @param mixed $value Variable value
-     *
-     * @return mixed
      */
-    public function __set(string $name, mixed $value)
+    public function __set(string $name, mixed $value): void
     {
         switch ($name) {
             case 'order':
@@ -79,13 +70,9 @@ abstract class CriteriaElement
 
     /**
      * For compatibility. Probably will be removed in feature
-     * Checks if variable value is set
-     *
-     * @param string $name Variable name
-     *
-     * @return mixed
+     * Checks if a variable value is set
      */
-    public function __isset($name)
+    public function __isset(string $name): bool
     {
         return match ($name) {
             'order' => $this->getOrder() !== null,
