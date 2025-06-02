@@ -9,10 +9,7 @@ namespace Imponeer\Database\Criteria\Traits;
  */
 trait GroupByTrait
 {
-    /**
-     * @var null|string
-     */
-    protected $group = null;
+    protected ?string $group = null;
 
     /**
      * Sets group by
@@ -21,7 +18,7 @@ trait GroupByTrait
      *
      * @return self
      */
-    public function setGroupBy($group): self
+    public function setGroupBy(string $group): self
     {
         $this->group = $group;
 
@@ -29,7 +26,7 @@ trait GroupByTrait
     }
 
     /**
-     * Gets group by value
+     * Gets a group by value
      *
      * @return    string
      */

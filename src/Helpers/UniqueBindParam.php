@@ -11,10 +11,8 @@ final class UniqueBindParam
 {
     /**
      * Last generated bind suffix ID
-     *
-     * @var int
      */
-    static private $lastGeneratedBindSuffixId = 0;
+    static private int $lastGeneratedBindSuffixId = 0;
 
     /**
      * UniqueBindParam constructor.

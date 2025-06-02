@@ -10,15 +10,8 @@ namespace Imponeer\Database\Criteria\Traits;
 trait PartialResultsTrait
 {
 
-    /**
-     * @var    int
-     */
-    protected $limit = 0;
-
-    /**
-     * @var    int
-     */
-    protected $start = 0;
+    protected int $limit = 0;
+    protected int $start = 0;
 
     /**
      * Gets how many results to return
@@ -37,9 +30,9 @@ trait PartialResultsTrait
      *
      * @return self
      */
-    public function setLimit($limit = 0): self
+    public function setLimit(int $limit = 0): self
     {
-        $this->limit = (int)$limit;
+        $this->limit = $limit;
 
         return $this;
     }
