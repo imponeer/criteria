@@ -7,6 +7,8 @@ use Imponeer\Database\Criteria\Traits\OrderByTrait;
 use Imponeer\Database\Criteria\Traits\PartialResultsTrait;
 use Imponeer\Database\Criteria\Traits\RenderingTrait;
 use Imponeer\Database\Criteria\Traits\SortByTrait;
+use JsonSerializable;
+use Stringable;
 use ValueError;
 
 /**
@@ -14,7 +16,7 @@ use ValueError;
  *
  * @package Imponeer\Database\Criteria
  */
-abstract class CriteriaElement
+abstract class CriteriaElement implements Stringable
 {
     use GroupByTrait, OrderByTrait, PartialResultsTrait, RenderingTrait, SortByTrait;
 

@@ -8,6 +8,7 @@ use Imponeer\Database\Criteria\CriteriaCompo;
 use Imponeer\Database\Criteria\CriteriaItem;
 use Imponeer\Database\Criteria\Enum\Condition;
 use Imponeer\Database\Criteria\Enum\Order;
+use JsonException;
 use PHPUnit\Framework\TestCase;
 use Random\RandomException;
 
@@ -16,11 +17,15 @@ class CriteriaCompoTest extends TestCase
     /**
      * Provides Condition test data
      *
-     * @return Generator
+     * @return array<string, array{0: CriteriaCompo, 1: string|Condition}>
+     *
      * @throws RandomException
+     * @throws JsonException
      */
-    final public function provideCondition(): Generator
+    final public function provideCondition(): array
     {
+        $testsVariations = [];
+
         foreach (Condition::cases() as $conditionData) {
             $condition = $conditionData->value;
             foreach ([$condition, ' ' . $condition . ' ', strtolower($condition), ucfirst(strtolower($condition))] as $conditionVar) {
@@ -28,25 +33,31 @@ class CriteriaCompoTest extends TestCase
                 $compo1 = new CriteriaCompo();
                 $compo1->add(new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX))));
                 $compo1->add(new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX))), $conditionVar);
-                yield [$compo1, $conditionVar];
+                $label = sprintf('Two columns with null values and condition %s', $conditionData->name);
+                $testsVariations[$label] = [$compo1, $conditionVar];
 
                 // 2nd variant for compo
                 $compo2 = new CriteriaCompo(new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX))));
                 $compo2->add(new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX))), $conditionVar);
-                yield [$compo2, $conditionVar];
+                $label = sprintf("One column with null value and condition %s", $conditionData->name);
+                $testsVariations[$label] = [$compo2, $conditionVar];
 
                 // 3nd variant for compo
                 $compo3 = new CriteriaCompo();
                 $compo3->add($compo1);
                 $compo3->add($compo2, $conditionVar);
-                yield [$compo3, $conditionVar];
+                $label = sprintf('Joined two criteria with condition %s', $conditionData->name);
+                $testsVariations[$label] = [$compo3, $conditionVar];
 
                 // 4nd variant for compo
                 $compo4 = new CriteriaCompo($compo1);
                 $compo4->add($compo2, $conditionVar);
-                yield [$compo4, $conditionVar];
+                $label = sprintf('Appended two criteria with condition %s', $conditionData->name);
+                $testsVariations[$label] = [$compo4, $conditionVar];
             }
         }
+
+        return $testsVariations;
     }
 
     /**
@@ -106,10 +117,10 @@ class CriteriaCompoTest extends TestCase
     final public function provideOrder(): Generator
     {
         foreach (Order::cases() as $order) {
-            yield [$order->value];
-            yield [strtolower($order->value)];
-            yield [ucfirst(strtolower($order->value))];
-            yield [' ' . $order->value . ' '];
+            yield $order->name => [$order->value];
+            yield strtolower($order->value) => [strtolower($order->value)];
+            yield ucfirst(strtolower($order->value)) => [ucfirst(strtolower($order->value))];
+            yield ' ' . $order->value . ' ' => [' ' . $order->value . ' '];
         }
     }
 

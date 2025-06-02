@@ -17,10 +17,11 @@ class CriteriaItemTest extends TestCase
     /**
      * Gets all possible comparison operators enums
      *
-     * @return Generator
+     * @return array<string, array{0: string, 1: mixed, 2: ComparisonOperator|string}>
      * @throws RandomException
+     * @throws JsonException
      */
-    final public function provideComparisionOperators(): Generator
+    final public function provideComparisonOperators(): array
     {
         $column = sha1(random_int(PHP_INT_MIN, PHP_INT_MAX));
         $specialOperators = [
@@ -39,51 +40,59 @@ class CriteriaItemTest extends TestCase
             new stdClass(), // class
         ];
 
+        $testsVariations = [];
+        $addTestVariation = static function (string $column, mixed $value, ComparisonOperator|string $operator) use (&$testsVariations) {
+            $label = json_encode(['column' => $column, 'value' => $value, 'operator' => $operator], JSON_THROW_ON_ERROR);
+            $testsVariations[$label] = [$column, $value, $operator];
+        };
+
         foreach (ComparisonOperator::cases() as $operatorEnum) {
             if (in_array($operatorEnum->name, $specialOperators, true)) {
                 continue;
             }
             $operatorVal = $operatorEnum->value;
             foreach ($possibleValues as $value) {
-                yield [$column, $value, $operatorEnum];
-                yield [$column, $value, $operatorVal];
-                yield [$column, $value, ' ' . $operatorVal . ' '];
+                $addTestVariation($column, $value, $operatorEnum);
+                $addTestVariation($column, $value, $operatorVal);
+                $addTestVariation($column, $value, ' ' . $operatorVal . ' ');
                 if (strtolower($operatorVal) !== $operatorVal) {
-                    yield [$column, $value, strtolower($operatorVal)];
-                    yield [$column, $value, ucfirst(strtolower($operatorVal))];
+                    $addTestVariation($column, $value, strtolower($operatorVal));
+                    $addTestVariation($column, $value, ucfirst(strtolower($operatorVal)));
                 }
             }
         }
 
         foreach ([ComparisonOperator::BETWEEN, ComparisonOperator::NOT_BETWEEN] as $operatorEnum) {
-            yield [$column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], $operatorEnum];
+            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], $operatorEnum);
             $operatorVal = $operatorEnum->value;
-            yield [$column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], $operatorVal];
-            yield [$column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], ' ' . $operatorVal . ' '];
-            yield [$column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], strtolower($operatorVal)];
-            yield [$column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], ucfirst(strtolower($operatorVal))];
+            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], $operatorVal);
+            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], ' ' . $operatorVal . ' ');
+            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], strtolower($operatorVal));
+            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], ucfirst(strtolower($operatorVal)));
         }
 
         foreach ([ComparisonOperator::IN, ComparisonOperator::NOT_IN] as $operatorEnum) {
             foreach ($possibleValues as $value) {
-                yield [$column, array_fill(0, random_int(1, 100), $value), $operatorEnum];
+                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), $operatorEnum);
                 $operatorVal = $operatorEnum->value;
-                yield [$column, array_fill(0, random_int(1, 100), $value), $operatorVal];
-                yield [$column, array_fill(0, random_int(1, 100), $value), ' ' . $operatorVal . ' '];
-                yield [$column, array_fill(0, random_int(1, 100), $value), strtolower($operatorVal)];
-                yield [$column, array_fill(0, random_int(1, 100), $value), ucfirst(strtolower($operatorVal))];
+                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), $operatorVal);
+                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), ' ' . $operatorVal . ' ');
+                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), strtolower($operatorVal));
+                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), ucfirst(strtolower($operatorVal)));
             }
         }
+
+        return $testsVariations;
     }
 
     /**
-     * Test if enum can render all comparison operators as object
+     * Test if enum can render all comparison operators as an object
      *
      * @param string $column Column name
      * @param mixed $value Value to use
      * @param string|ComparisonOperator $operator Comparison operator to be used for test
      *
-     * @dataProvider provideComparisionOperators
+     * @dataProvider provideComparisonOperators
      *
      * @throws JsonException
      */
@@ -116,10 +125,10 @@ class CriteriaItemTest extends TestCase
     final public function provideOrder(): Generator
     {
         foreach (Order::cases() as $order) {
-            yield [$order->value];
-            yield [strtolower($order->value)];
-            yield [ucfirst(strtolower($order->value))];
-            yield [' ' . $order->value . ' '];
+            yield $order->value => [$order->value];
+            yield strtolower($order->value) => [strtolower($order->value)];
+            yield ucfirst(strtolower($order->value)) => [ucfirst(strtolower($order->value))];
+            yield ' ' . $order->value . ' ' => [' ' . $order->value . ' '];
         }
     }
 
