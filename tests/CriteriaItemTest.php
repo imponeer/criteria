@@ -2,103 +2,118 @@
 
 namespace Imponeer\Tests\Database\Criteria;
 
+use Generator;
 use Imponeer\Database\Criteria\CriteriaItem;
-use Imponeer\Database\Criteria\Enum\ComparisionOperator;
+use Imponeer\Database\Criteria\Enum\ComparisonOperator;
 use Imponeer\Database\Criteria\Enum\Order;
+use JsonException;
 use PHPUnit\Framework\TestCase;
+use Random\RandomException;
 use stdClass;
 
 class CriteriaItemTest extends TestCase
 {
 
     /**
-     * Gets all possible comparision operators enums
+     * Gets all possible comparison operators enums
      *
-     * @return Generator
+     * @return array<string, array{0: string, 1: mixed, 2: ComparisonOperator|string}>
+     * @throws RandomException
+     * @throws JsonException
      */
-    public function provideComparisionOperators()
+    final public function provideComparisonOperators(): array
     {
-        $column = sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX));
+        $column = sha1(random_int(PHP_INT_MIN, PHP_INT_MAX));
         $specialOperators = [
-            ComparisionOperator::BETWEEN()->getKey(),
-            ComparisionOperator::NOT_BETWEEN()->getKey(),
-            ComparisionOperator::IN()->getKey(),
-            ComparisionOperator::NOT_IN()->getKey(),
+            ComparisonOperator::BETWEEN->name,
+            ComparisonOperator::NOT_BETWEEN->name,
+            ComparisonOperator::IN->name,
+            ComparisonOperator::NOT_IN->name,
         ];
         $possibleValues = [
             null,  // null value
-            md5(mt_rand(PHP_INT_MIN, PHP_INT_MAX)),  // random string
-            mt_rand(PHP_INT_MIN, PHP_INT_MAX), // random int
+            md5(random_int(PHP_INT_MIN, PHP_INT_MAX)),  // random string
+            random_int(PHP_INT_MIN, PHP_INT_MAX), // random int
             mt_rand() / mt_getrandmax(), // random float
             true, // true
             [], // array
             new stdClass(), // class
         ];
 
-        foreach (ComparisionOperator::values() as $operatorEnum) {
-            if (in_array($operatorEnum->getKey(), $specialOperators, true)) {
+        $testsVariations = [];
+        $addTestVariation = static function (string $column, mixed $value, ComparisonOperator|string $operator) use (&$testsVariations) {
+            $label = json_encode(['column' => $column, 'value' => $value, 'operator' => $operator], JSON_THROW_ON_ERROR);
+            $testsVariations[$label] = [$column, $value, $operator];
+        };
+
+        foreach (ComparisonOperator::cases() as $operatorEnum) {
+            if (in_array($operatorEnum->name, $specialOperators, true)) {
                 continue;
             }
-            $operatorVal = $operatorEnum->getValue();
+            $operatorVal = $operatorEnum->value;
             foreach ($possibleValues as $value) {
-                yield [$column, $value, $operatorEnum];
-                yield [$column, $value, $operatorVal];
-                yield [$column, $value, ' ' . $operatorVal . ' '];
+                $addTestVariation($column, $value, $operatorEnum);
+                $addTestVariation($column, $value, $operatorVal);
+                $addTestVariation($column, $value, ' ' . $operatorVal . ' ');
                 if (strtolower($operatorVal) !== $operatorVal) {
-                    yield [$column, $value, strtolower($operatorVal)];
-                    yield [$column, $value, ucfirst(strtolower($operatorVal))];
+                    $addTestVariation($column, $value, strtolower($operatorVal));
+                    $addTestVariation($column, $value, ucfirst(strtolower($operatorVal)));
                 }
             }
         }
 
-        foreach ([ComparisionOperator::BETWEEN(), ComparisionOperator::NOT_BETWEEN()] as $operatorEnum) {
-            yield [$column, [mt_rand(PHP_INT_MIN, 0), mt_rand(1, PHP_INT_MAX)], $operatorEnum];
-            $operatorVal = $operatorEnum->getValue();
-            yield [$column, [mt_rand(PHP_INT_MIN, 0), mt_rand(1, PHP_INT_MAX)], $operatorVal];
-            yield [$column, [mt_rand(PHP_INT_MIN, 0), mt_rand(1, PHP_INT_MAX)], ' ' . $operatorVal . ' '];
-            yield [$column, [mt_rand(PHP_INT_MIN, 0), mt_rand(1, PHP_INT_MAX)], strtolower($operatorVal)];
-            yield [$column, [mt_rand(PHP_INT_MIN, 0), mt_rand(1, PHP_INT_MAX)], ucfirst(strtolower($operatorVal))];
+        foreach ([ComparisonOperator::BETWEEN, ComparisonOperator::NOT_BETWEEN] as $operatorEnum) {
+            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], $operatorEnum);
+            $operatorVal = $operatorEnum->value;
+            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], $operatorVal);
+            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], ' ' . $operatorVal . ' ');
+            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], strtolower($operatorVal));
+            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], ucfirst(strtolower($operatorVal)));
         }
 
-        foreach ([ComparisionOperator::IN(), ComparisionOperator::NOT_IN()] as $operatorEnum) {
+        foreach ([ComparisonOperator::IN, ComparisonOperator::NOT_IN] as $operatorEnum) {
             foreach ($possibleValues as $value) {
-                yield [$column, array_fill(0, mt_rand(1, 100), $value), $operatorEnum];
-                $operatorVal = $operatorEnum->getValue();
-                yield [$column, array_fill(0, mt_rand(1, 100), $value), $operatorVal];
-                yield [$column, array_fill(0, mt_rand(1, 100), $value), ' ' . $operatorVal . ' '];
-                yield [$column, array_fill(0, mt_rand(1, 100), $value), strtolower($operatorVal)];
-                yield [$column, array_fill(0, mt_rand(1, 100), $value), ucfirst(strtolower($operatorVal))];
+                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), $operatorEnum);
+                $operatorVal = $operatorEnum->value;
+                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), $operatorVal);
+                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), ' ' . $operatorVal . ' ');
+                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), strtolower($operatorVal));
+                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), ucfirst(strtolower($operatorVal)));
             }
         }
+
+        return $testsVariations;
     }
 
     /**
-     * Test if all comparision operators can be rendered by enum as object
+     * Test if enum can render all comparison operators as an object
      *
      * @param string $column Column name
      * @param mixed $value Value to use
-     * @param ComparisionOperator|string $operator Comparision operator to be used for test
+     * @param string|ComparisonOperator $operator Comparison operator to be used for test
      *
-     * @dataProvider provideComparisionOperators
+     * @dataProvider provideComparisonOperators
+     *
+     * @throws JsonException
      */
-    public function testIfOperatorRendersContent(string $column, $value, $operator)
+    final public function testIfOperatorRendersContent(string $column, mixed $value, ComparisonOperator|string $operator): void
     {
         $criteria = new CriteriaItem($column, $value, $operator);
         self::assertNotEmpty(
             $criteria->render(false),
-            'Criteria with condition ' . $operator . ' doesn\'t renders SQL (without binds)'
+            'Criteria with condition ' . $criteria->getComparisonOperator()->name . ' doesn\'t renders SQL (without binds)'
         );
         self::assertNotEmpty(
             $criteria->renderWhere(false),
-            'Criteria with condition ' . $operator . ' doesn\'t renders WHERE SQL (without binds)'
+            'Criteria with condition ' . $criteria->getComparisonOperator()->name . ' doesn\'t renders WHERE SQL (without binds)'
         );
         self::assertNotEmpty(
             $criteria->render(true),
-            'Criteria with condition ' . $operator . ' doesn\'t renders SQL (with binds)'
+            'Criteria with condition ' . $criteria->getComparisonOperator()->name . ' doesn\'t renders SQL (with binds)'
         );
         self::assertNotEmpty(
             $criteria->renderWhere(true),
-            'Criteria with condition ' . $operator . ' doesn\'t renders WHERE SQL (with binds)'
+            'Criteria with condition ' . $criteria->getComparisonOperator()->name . ' doesn\'t renders WHERE SQL (with binds)'
         );
     }
 
@@ -107,39 +122,43 @@ class CriteriaItemTest extends TestCase
      *
      * @return Generator
      */
-    public function provideOrder()
+    final public function provideOrder(): Generator
     {
-        foreach (Order::values() as $order) {
-            yield [$order];
-            yield [strtolower($order)];
-            yield [ucfirst(strtolower($order))];
-            yield [' ' . $order . ' '];
+        foreach (Order::cases() as $order) {
+            yield $order->value => [$order->value];
+            yield strtolower($order->value) => [strtolower($order->value)];
+            yield ucfirst(strtolower($order->value)) => [ucfirst(strtolower($order->value))];
+            yield ' ' . $order->value . ' ' => [' ' . $order->value . ' '];
         }
     }
 
     /**
      * Tests order with enums
      *
-     * @param Order|string $order
+     * @param string|Order $order
      *
      * @dataProvider provideOrder
+     *
+     * @throws RandomException
      */
-    public function testOrder($order)
+    final public function testOrder(Order|string $order): void
     {
-        $criteria = new CriteriaItem(sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX)));
-        self::assertSame(Order::ASC()->getValue(), (string)$criteria->getOrder(), 'Default order is not correct');
+        $criteria = new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX)));
+        self::assertSame(Order::ASC->value, $criteria->getOrder()->value, 'Default order is not correct');
         $criteria->setOrder($order);
-        self::assertSame(strtoupper(trim($order)), (string)$criteria->getOrder(), 'Order ' . $order . ' does\'t sets');
+        self::assertSame(strtoupper(trim($order)), $criteria->getOrder()->value, 'Order ' . $order . ' does\'t sets');
     }
 
     /**
      * Tests group by operations
+     *
+     * @throws RandomException
      */
-    public function testGroupBy()
+    final public function testGroupBy(): void
     {
-        $criteria = new CriteriaItem(sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX)));
+        $criteria = new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX)));
         self::assertEmpty($criteria->getGroupBy(), 'Default group by is not empty');
-        $groupBy = sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX));
+        $groupBy = sha1(random_int(PHP_INT_MIN, PHP_INT_MAX));
         $criteria->setGroupBy($groupBy);
         self::assertNotEmpty($criteria->getGroupBy(), 'Group by was set but value wasn\'t modified');
         self::assertStringStartsWith('GROUP BY', trim($criteria->getGroupBy()), 'Non empty group by doesn\' starts with "GROUP BY"');
@@ -148,12 +167,13 @@ class CriteriaItemTest extends TestCase
 
     /**
      * Tests sort by operations
+     * @throws RandomException
      */
-    public function testSortBy()
+    final public function testSortBy(): void
     {
-        $criteria = new CriteriaItem(sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX)));
+        $criteria = new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX)));
         self::assertEmpty($criteria->getSort(), 'Default sort by is not empty');
-        $sort = sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX));
+        $sort = sha1(random_int(PHP_INT_MIN, PHP_INT_MAX));
         $criteria->setSort($sort);
         self::assertNotEmpty($criteria->getSort(), 'Sort by was set but value wasn\'t modified');
         self::assertStringContainsString($sort, $criteria->getSort(), 'Sort by value doesn\'t exists');
@@ -161,14 +181,15 @@ class CriteriaItemTest extends TestCase
 
     /**
      * Tests limit/from by operations
+     * @throws RandomException
      */
-    public function testPartialResults()
+    final public function testPartialResults(): void
     {
-        $criteria = new CriteriaItem(sha1(mt_rand(PHP_INT_MIN, PHP_INT_MAX)));
+        $criteria = new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX)));
         self::assertSame(0, $criteria->getLimit(), 'Default limit is not 0');
         self::assertSame(0, $criteria->getStart(), 'Default start is not 0');
-        $limit = mt_rand(1, PHP_INT_MAX);
-        $start = mt_rand(1, PHP_INT_MAX);
+        $limit = random_int(1, PHP_INT_MAX);
+        $start = random_int(1, PHP_INT_MAX);
         $criteria->setLimit($limit)->setStart($start);
         self::assertSame($limit, $criteria->getLimit(), 'Updated limit is not same as should be');
         self::assertSame($start, $criteria->getStart(), 'Updated start is not same as should be');

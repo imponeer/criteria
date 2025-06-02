@@ -9,19 +9,15 @@ namespace Imponeer\Database\Criteria\Traits;
  */
 trait GroupByTrait
 {
-    /**
-     * @var null|string
-     */
-    protected $group = null;
+    protected ?string $group = null;
 
     /**
      * Sets group by
      *
-     * @param string $group
-     *
-     * @return self
+     * @noinspection MethodShouldBeFinalInspection
+     * @noinspection PhpDocSignatureInspection
      */
-    public function setGroupBy($group): self
+    public function setGroupBy(string $group): self
     {
         $this->group = $group;
 
@@ -29,9 +25,9 @@ trait GroupByTrait
     }
 
     /**
-     * Gets group by value
+     * Gets a group by value
      *
-     * @return    string
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function getGroupBy(): string
     {

@@ -2,27 +2,31 @@
 
 namespace Imponeer\Database\Criteria;
 
+use Exception;
 use Imponeer\Database\Criteria\Enum\Condition;
+use IteratorAggregate;
+use Stringable;
+use Traversable;
 
 /**
  * Criteria elements collection
  *
  * @package Imponeer\Database\Criteria
  */
-class CriteriaCompo extends CriteriaElement implements \IteratorAggregate
+class CriteriaCompo extends CriteriaElement implements IteratorAggregate
 {
     /**
-     * @var [CriteriaElement,string][]
+     * @var array<array{0: CriteriaElement, 1: Condition}>
      */
-    protected $elements = [];
+    protected array $elements = [];
 
     /**
      * Constructor
      *
-     * @param CriteriaElement|null $criteria Criteria element to add at start
-     * @param string $condition Join condition
+     * @param CriteriaElement|null $criteria Criteria element to add at the start
+     * @param Condition|string $condition Join condition
      */
-    public function __construct(?CriteriaElement $criteria = null, $condition = 'AND')
+    public function __construct(?CriteriaElement $criteria = null, Condition|string $condition = Condition::AND)
     {
         parent::__construct();
 
@@ -32,28 +36,31 @@ class CriteriaCompo extends CriteriaElement implements \IteratorAggregate
     }
 
     /**
-     * Add criteria element to collection
+     * Add a criteria element to a collection
      *
      * @param CriteriaElement $criteriaElement Criteria element to add
      * @param string|Condition $condition Condition
      *
      * @return $this
+     *
+     * @noinspection MethodShouldBeFinalInspection
      */
-    public function add(CriteriaElement $criteriaElement, $condition = 'AND'): self
+    public function add(CriteriaElement $criteriaElement, Condition|string $condition = Condition::AND): self
     {
-        if ($condition instanceof Condition) {
-            $this->elements[] = [$criteriaElement, $condition];
-        } else {
-            $condition = strtoupper(trim($condition));
-            Condition::assertValidValue($condition);
-            $this->elements[] = [$criteriaElement, Condition::from($condition)];
-        }
+        $this->elements[] = [
+            $criteriaElement,
+            $condition instanceof Condition ? $condition : Condition::from(strtoupper(trim($condition)))
+        ];
 
         return $this;
     }
 
     /**
      * @inheritDoc
+     *
+     * @throws Exception
+     *
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function getBindData(): array
     {
@@ -68,8 +75,12 @@ class CriteriaCompo extends CriteriaElement implements \IteratorAggregate
 
     /**
      * @inheritDoc
+     *
+     * @return Traversable<string, CriteriaElement>
+     *
+     * @noinspection MethodShouldBeFinalInspection
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         foreach ($this->elements as $item) {
             yield $item[1] => $item[0];
@@ -78,6 +89,10 @@ class CriteriaCompo extends CriteriaElement implements \IteratorAggregate
 
     /**
      * @inheritDoc
+     *
+     * @throws Exception
+     *
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function render(bool $withBindVariables = false): ?string
     {
@@ -87,11 +102,19 @@ class CriteriaCompo extends CriteriaElement implements \IteratorAggregate
             if ($first) {
                 $first = false;
             } else {
-                $ret .= ' ' . $join . ' ';
+                $ret .= ' ' . ($join instanceof Condition ? $join->value : $join) . ' ';
             }
             $ret .= '(' . $element->render($withBindVariables) . ')';
         }
 
         return $ret;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function __toString(): string
+    {
+        return $this->render() . 'A';
     }
 }

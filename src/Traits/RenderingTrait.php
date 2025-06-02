@@ -15,7 +15,7 @@ trait RenderingTrait
      *
      * @param bool $withBinds Render with bind variables
      *
-     * @return    string
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function renderWhere(bool $withBinds = false): string
     {
@@ -27,8 +27,6 @@ trait RenderingTrait
      * Render the criteria string
      *
      * @param bool $withBindVariables Render with bind variables
-     *
-     * @return string|null
      */
     abstract public function render(bool $withBindVariables = false): ?string;
 

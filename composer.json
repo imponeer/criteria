@@ -10,12 +10,16 @@
     }
   ],
   "require": {
-    "myclabs/php-enum": "^1.8",
-    "php": "^7.3 || ^8.0"
+    "php": ">=8.3"
   },
   "autoload": {
     "psr-4": {
       "Imponeer\\Database\\Criteria\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Imponeer\\Database\\Criteria\\Tests\\": "tests/"
     }
   },
   "keywords": [

@@ -11,10 +11,8 @@ final class UniqueBindParam
 {
     /**
      * Last generated bind suffix ID
-     *
-     * @var int
      */
-    static private $lastGeneratedBindSuffixId = 0;
+    static private int $lastGeneratedBindSuffixId = 0;
 
     /**
      * UniqueBindParam constructor.
@@ -27,8 +25,6 @@ final class UniqueBindParam
      * Generates unique bind name from column name
      *
      * @param string $column Column name
-     *
-     * @return string
      */
     public static function generate(string $column): string
     {

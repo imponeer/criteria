@@ -2,19 +2,21 @@
 
 namespace Imponeer\Database\Criteria;
 
-use Imponeer\Database\Criteria\Exceptions\UnsupportedOrderException;
 use Imponeer\Database\Criteria\Traits\GroupByTrait;
 use Imponeer\Database\Criteria\Traits\OrderByTrait;
 use Imponeer\Database\Criteria\Traits\PartialResultsTrait;
 use Imponeer\Database\Criteria\Traits\RenderingTrait;
 use Imponeer\Database\Criteria\Traits\SortByTrait;
+use JsonSerializable;
+use Stringable;
+use ValueError;
 
 /**
  * Defines base criteria element
  *
  * @package Imponeer\Database\Criteria
  */
-abstract class CriteriaElement
+abstract class CriteriaElement implements Stringable
 {
     use GroupByTrait, OrderByTrait, PartialResultsTrait, RenderingTrait, SortByTrait;
 
@@ -28,39 +30,24 @@ abstract class CriteriaElement
     /**
      * For compatibility. Probably will be removed in feature
      * Gets variable value
-     *
-     * @param string $name Variable name
-     *
-     * @return mixed
      */
-    public function __get($name)
+    public function __get(string $name): string|int
     {
-        switch ($name) {
-            case 'order':
-                return (string)$this->getOrder();
-            case 'sort':
-                return $this->getSort();
-            case 'limit':
-                return $this->getLimit();
-            case 'start':
-                return $this->getStart();
-            case 'groupBy':
-                /** @noinspection SpellCheckingInspection */
-            case 'groupby':
-                return $this->getGroupBy();
-        }
+        return match ($name) {
+            'order' => $this->getOrder()->value,
+            'sort' => $this->getSort(),
+            'limit' => $this->getLimit(),
+            'start' => $this->getStart(),
+            'groupBy', 'groupby' => $this->getGroupBy(),
+            default => throw new ValueError('Unknown property: ' . $name),
+        };
     }
 
     /**
-     * For compatibility. Probably will be removed in feature
+     * For compatibility. Probably will be removed in the feature
      * Sets variable
-     *
-     * @param string $name Variable name
-     * @param mixed $value Variable value
-     *
-     * @return mixed
      */
-    public function __set($name, $value)
+    public function __set(string $name, mixed $value): void
     {
         switch ($name) {
             case 'order':
@@ -85,29 +72,17 @@ abstract class CriteriaElement
 
     /**
      * For compatibility. Probably will be removed in feature
-     * Checks if variable value is set
-     *
-     * @param string $name Variable name
-     *
-     * @return mixed
+     * Checks if a variable value is set
      */
-    public function __isset($name)
+    public function __isset(string $name): bool
     {
-        switch ($name) {
-            case 'order':
-                return $this->getOrder() !== null;
-            case 'sort':
-                return !empty($this->getSort());
-            case 'limit':
-                return !empty($this->getLimit());
-            case 'start':
-                return !empty($this->getStart());
-            case 'groupBy':
-                /** @noinspection SpellCheckingInspection */
-            case 'groupby':
-                return !empty($this->getGroupBy());
-            default:
-                return false;
-        }
+        return match ($name) {
+            'order' => $this->getOrder() !== null,
+            'sort' => !empty($this->getSort()),
+            'limit' => !empty($this->getLimit()),
+            'start' => !empty($this->getStart()),
+            'groupBy', 'groupby' => !empty($this->getGroupBy()),
+            default => false,
+        };
     }
 }

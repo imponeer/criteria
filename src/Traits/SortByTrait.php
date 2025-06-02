@@ -10,15 +10,12 @@ namespace Imponeer\Database\Criteria\Traits;
 trait SortByTrait
 {
 
-    /**
-     * @var    string|null
-     */
-    protected $sort = null;
+    protected ?string $sort = null;
 
     /**
      * Gets sort field
      *
-     * @return    string
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function getSort(): string
     {
@@ -28,9 +25,9 @@ trait SortByTrait
     /**
      * Sets sort field
      *
-     * @param string $sort Database field name for sorting
+     * @param string|null $sort Database field name for sorting
      *
-     * @return self
+     * @noinspection MethodShouldBeFinalInspection
      */
     public function setSort(?string $sort): self
     {

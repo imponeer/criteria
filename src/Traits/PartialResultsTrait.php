@@ -10,21 +10,14 @@ namespace Imponeer\Database\Criteria\Traits;
 trait PartialResultsTrait
 {
 
-    /**
-     * @var    int
-     */
-    protected $limit = 0;
-
-    /**
-     * @var    int
-     */
-    protected $start = 0;
+    protected int $limit = 0;
+    protected int $start = 0;
 
     /**
      * Gets how many results to return
      *
-     * @return    int
-     */
+     * @noinspection MethodShouldBeFinalInspection
+     **/
     public function getLimit(): int
     {
         return $this->limit;
@@ -35,11 +28,11 @@ trait PartialResultsTrait
      *
      * @param int $limit Limit for results
      *
-     * @return self
+     * @noinspection MethodShouldBeFinalInspection
      */
-    public function setLimit($limit = 0): self
+    public function setLimit(int $limit = 0): self
     {
-        $this->limit = (int)$limit;
+        $this->limit = $limit;
 
         return $this;
     }
@@ -47,7 +40,8 @@ trait PartialResultsTrait
     /**
      * Gets from what record number to return results (counting starts from 0)
      *
-     * @return    int
+     * @noinspection MethodShouldBeFinalInspection
+     * @noinspection PhpDocSignatureInspection
      */
     public function getStart(): int
     {
@@ -59,7 +53,8 @@ trait PartialResultsTrait
      *
      * @param int $start Sets start position
      *
-     * @return self
+     * @noinspection MethodShouldBeFinalInspection
+     * @noinspection PhpDocSignatureInspection
      */
     public function setStart(int $start = 0): self
     {
