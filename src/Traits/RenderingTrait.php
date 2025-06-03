@@ -9,7 +9,6 @@ namespace Imponeer\Database\Criteria\Traits;
  */
 trait RenderingTrait
 {
-
     /**
      * Renders as 'where' SQL string
      *
@@ -29,5 +28,4 @@ trait RenderingTrait
      * @param bool $withBindVariables Render with bind variables
      */
     abstract public function render(bool $withBindVariables = false): ?string;
-
 }

@@ -2,7 +2,6 @@
 
 namespace Imponeer\Database\Criteria\Enum;
 
-
 /**
  * Defines how to order results
  *
@@ -10,7 +9,6 @@ namespace Imponeer\Database\Criteria\Enum;
  */
 enum Order: string
 {
-
     /**
      * Sort in ASC mode
      */
@@ -20,5 +18,4 @@ enum Order: string
      * Sort in DESC mode
      */
     case DESC = 'DESC';
-
 }

@@ -9,7 +9,6 @@ namespace Imponeer\Database\Criteria\Traits;
  */
 trait PartialResultsTrait
 {
-
     protected int $limit = 0;
     protected int $start = 0;
 
@@ -62,5 +61,4 @@ trait PartialResultsTrait
 
         return $this;
     }
-
 }

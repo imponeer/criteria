@@ -3,6 +3,7 @@
 namespace Imponeer\Tests\Database\Criteria;
 
 use Exception;
+use Faker\Factory;
 use Generator;
 use Imponeer\Database\Criteria\CriteriaCompo;
 use Imponeer\Database\Criteria\CriteriaItem;
@@ -10,7 +11,6 @@ use Imponeer\Database\Criteria\Enum\Condition;
 use Imponeer\Database\Criteria\Enum\Order;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Random\RandomException;
 
 class CriteriaCompoTest extends TestCase
 {
@@ -18,26 +18,31 @@ class CriteriaCompoTest extends TestCase
      * Provides Condition test data
      *
      * @return array<string, array{0: CriteriaCompo, 1: string|Condition}>
-     *
-     * @throws RandomException
      */
     final public static function provideCondition(): array
     {
         $testsVariations = [];
+        $faker = Factory::create();
 
         foreach (Condition::cases() as $conditionData) {
             $condition = $conditionData->value;
-            foreach ([$condition, ' ' . $condition . ' ', strtolower($condition), ucfirst(strtolower($condition))] as $conditionVar) {
+            $conditionVariants = [
+                $condition,
+                ' ' . $condition . ' ',
+                strtolower($condition),
+                ucfirst(strtolower($condition)),
+            ];
+            foreach ($conditionVariants as $conditionVar) {
                 // first variant for compo
                 $compo1 = new CriteriaCompo();
-                $compo1->add(new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX))));
-                $compo1->add(new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX))), $conditionVar);
+                $compo1->add(new CriteriaItem($faker->sha1()));
+                $compo1->add(new CriteriaItem($faker->sha1()), $conditionVar);
                 $label = sprintf('Two columns with null values and condition %s', $conditionData->name);
                 $testsVariations[$label] = [$compo1, $conditionVar];
 
                 // 2nd variant for compo
-                $compo2 = new CriteriaCompo(new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX))));
-                $compo2->add(new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX))), $conditionVar);
+                $compo2 = new CriteriaCompo(new CriteriaItem($faker->sha1()));
+                $compo2->add(new CriteriaItem($faker->sha1()), $conditionVar);
                 $label = sprintf("One column with null value and condition %s", $conditionData->name);
                 $testsVariations[$label] = [$compo2, $conditionVar];
 
@@ -138,30 +143,34 @@ class CriteriaCompoTest extends TestCase
 
     /**
      * Tests group by operations
-     *
-     * @throws RandomException
      */
     final public function testGroupBy(): void
     {
+        $faker = Factory::create();
+
         $criteria = new CriteriaCompo();
         self::assertEmpty($criteria->getGroupBy(), 'Default group by is not empty');
-        $groupBy = sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX));
+        $groupBy = $faker->sha1();
         $criteria->setGroupBy($groupBy);
         self::assertNotEmpty($criteria->getGroupBy(), 'Group by was set but value wasn\'t modified');
-        self::assertStringStartsWith('GROUP BY', trim($criteria->getGroupBy()), 'Non empty group by doesn\' starts with "GROUP BY"');
+        self::assertStringStartsWith(
+            'GROUP BY',
+            trim($criteria->getGroupBy()),
+            'Non empty group by doesn\' starts with "GROUP BY"'
+        );
         self::assertStringContainsString($groupBy, $criteria->getGroupBy(), 'Group by value doesn\'t exists');
     }
 
     /**
      * Tests sort by operations
-     *
-     * @throws RandomException
      */
     final public function testSortBy(): void
     {
+        $faker = Factory::create();
+
         $criteria = new CriteriaCompo();
         self::assertEmpty($criteria->getSort(), 'Default sort by is not empty');
-        $sort = sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX));
+        $sort = $faker->sha1();
         $criteria->setSort($sort);
         self::assertNotEmpty($criteria->getSort(), 'Sort by was set but value wasn\'t modified');
         self::assertStringContainsString($sort, $criteria->getSort(), 'Sort by value doesn\'t exists');
@@ -169,16 +178,16 @@ class CriteriaCompoTest extends TestCase
 
     /**
      * Tests limit/from by operations
-     *
-     * @throws RandomException
      */
     final public function testPartialResults(): void
     {
+        $faker = Factory::create();
+
         $criteria = new CriteriaCompo();
         self::assertSame(0, $criteria->getLimit(), 'Default limit is not 0');
         self::assertSame(0, $criteria->getStart(), 'Default start is not 0');
-        $limit = random_int(1, PHP_INT_MAX);
-        $start = random_int(1, PHP_INT_MAX);
+        $limit = $faker->numberBetween(1, PHP_INT_MAX);
+        $start = $faker->numberBetween(1, PHP_INT_MAX);
         $criteria->setLimit($limit)->setStart($start);
         self::assertSame($limit, $criteria->getLimit(), 'Updated limit is not same as should be');
         self::assertSame($start, $criteria->getStart(), 'Updated start is not same as should be');
@@ -186,5 +195,4 @@ class CriteriaCompoTest extends TestCase
         self::assertSame(0, $criteria->getLimit(), 'Reset limit is not 0');
         self::assertSame(0, $criteria->getStart(), 'Reset start is not 0');
     }
-
 }

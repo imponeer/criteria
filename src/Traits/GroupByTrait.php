@@ -33,5 +33,4 @@ trait GroupByTrait
     {
         return $this->group ? ' GROUP BY ' . $this->group : '';
     }
-
 }

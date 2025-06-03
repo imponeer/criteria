@@ -18,7 +18,11 @@ use ValueError;
  */
 abstract class CriteriaElement implements Stringable
 {
-    use GroupByTrait, OrderByTrait, PartialResultsTrait, RenderingTrait, SortByTrait;
+    use GroupByTrait;
+    use OrderByTrait;
+    use PartialResultsTrait;
+    use RenderingTrait;
+    use SortByTrait;
 
     /**
      * Gets data for rendered query for binding

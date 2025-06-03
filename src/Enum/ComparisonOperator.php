@@ -2,6 +2,8 @@
 
 namespace Imponeer\Database\Criteria\Enum;
 
+use PHPUnit\Framework\Constraint\Operator;
+
 /**
  * SQL comparison operator
  *
@@ -9,7 +11,6 @@ namespace Imponeer\Database\Criteria\Enum;
  */
 enum ComparisonOperator: string
 {
-
     /**
      * NULL value test
      */
@@ -99,4 +100,13 @@ enum ComparisonOperator: string
      * Whether string matches regular expression
      */
     case RLIKE = 'RLIKE';
+
+    public static function resolve(string|ComparisonOperator $operator): ComparisonOperator
+    {
+        if (is_string($operator)) {
+            return self::from(strtoupper(trim($operator)));
+        }
+
+        return $operator;
+    }
 }
