@@ -77,7 +77,7 @@ abstract class CriteriaElement implements Stringable
     public function __isset(string $name): bool
     {
         return match ($name) {
-            'order' => $this->getOrder() !== null,
+            'order' => true,
             'sort' => !empty($this->getSort()),
             'limit' => !empty($this->getLimit()),
             'start' => !empty($this->getStart()),

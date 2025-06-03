@@ -24,7 +24,7 @@ class CriteriaItemTest extends TestCase
      */
     final public static function provideComparisonOperators(): array
     {
-        $column = sha1(random_int(PHP_INT_MIN, PHP_INT_MAX));
+        $column = sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX));
         $specialOperators = [
             ComparisonOperator::BETWEEN->name,
             ComparisonOperator::NOT_BETWEEN->name,
@@ -33,7 +33,7 @@ class CriteriaItemTest extends TestCase
         ];
         $possibleValues = [
             null,  // null value
-            md5(random_int(PHP_INT_MIN, PHP_INT_MAX)),  // random string
+            md5((string) random_int(PHP_INT_MIN, PHP_INT_MAX)),  // random string
             random_int(PHP_INT_MIN, PHP_INT_MAX), // random int
             mt_rand() / mt_getrandmax(), // random float
             true, // true
@@ -142,7 +142,7 @@ class CriteriaItemTest extends TestCase
     #[DataProvider('provideOrder')]
     final public function testOrder(Order|string $order): void
     {
-        $criteria = new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX)));
+        $criteria = new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX)));
         self::assertSame(Order::ASC->value, $criteria->getOrder()->value, 'Default order is not correct');
         $criteria->setOrder($order);
         self::assertSame(strtoupper(trim($order)), $criteria->getOrder()->value, 'Order ' . $order . ' does\'t sets');
@@ -155,9 +155,9 @@ class CriteriaItemTest extends TestCase
      */
     final public function testGroupBy(): void
     {
-        $criteria = new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX)));
+        $criteria = new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX)));
         self::assertEmpty($criteria->getGroupBy(), 'Default group by is not empty');
-        $groupBy = sha1(random_int(PHP_INT_MIN, PHP_INT_MAX));
+        $groupBy = sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX));
         $criteria->setGroupBy($groupBy);
         self::assertNotEmpty($criteria->getGroupBy(), 'Group by was set but value wasn\'t modified');
         self::assertStringStartsWith('GROUP BY', trim($criteria->getGroupBy()), 'Non empty group by doesn\' starts with "GROUP BY"');
@@ -170,9 +170,9 @@ class CriteriaItemTest extends TestCase
      */
     final public function testSortBy(): void
     {
-        $criteria = new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX)));
+        $criteria = new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX)));
         self::assertEmpty($criteria->getSort(), 'Default sort by is not empty');
-        $sort = sha1(random_int(PHP_INT_MIN, PHP_INT_MAX));
+        $sort = sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX));
         $criteria->setSort($sort);
         self::assertNotEmpty($criteria->getSort(), 'Sort by was set but value wasn\'t modified');
         self::assertStringContainsString($sort, $criteria->getSort(), 'Sort by value doesn\'t exists');
@@ -184,7 +184,7 @@ class CriteriaItemTest extends TestCase
      */
     final public function testPartialResults(): void
     {
-        $criteria = new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX)));
+        $criteria = new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX)));
         self::assertSame(0, $criteria->getLimit(), 'Default limit is not 0');
         self::assertSame(0, $criteria->getStart(), 'Default start is not 0');
         $limit = random_int(1, PHP_INT_MAX);

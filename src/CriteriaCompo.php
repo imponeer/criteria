@@ -76,14 +76,14 @@ class CriteriaCompo extends CriteriaElement implements IteratorAggregate
     /**
      * @inheritDoc
      *
-     * @return Traversable<string, CriteriaElement>
+     * @return Traversable<Condition, CriteriaElement>
      *
      * @noinspection MethodShouldBeFinalInspection
      */
     public function getIterator(): Traversable
     {
-        foreach ($this->elements as $item) {
-            yield $item[1] => $item[0];
+        foreach ($this->elements as [$criteriaElement, $condition]) {
+            yield $condition => $criteriaElement;
         }
     }
 
@@ -102,7 +102,7 @@ class CriteriaCompo extends CriteriaElement implements IteratorAggregate
             if ($first) {
                 $first = false;
             } else {
-                $ret .= ' ' . ($join instanceof Condition ? $join->value : $join) . ' ';
+                $ret .= ' ' . $join->value . ' ';
             }
             $ret .= '(' . $element->render($withBindVariables) . ')';
         }

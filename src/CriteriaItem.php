@@ -219,7 +219,7 @@ class CriteriaItem extends CriteriaElement
 
     private function isEmptyArrayButNotNullComparison(mixed $value): bool
     {
-        return is_array($value) && empty($value) && in_array($this->operator->value, [
+        return is_array($value) && empty($value) && in_array($this->operator, [
                 ComparisonOperator::IS_NOT_NULL,
                 ComparisonOperator::IS_NULL,
                 ComparisonOperator::BETWEEN,
