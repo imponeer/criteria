@@ -9,6 +9,7 @@ use Imponeer\Database\Criteria\CriteriaItem;
 use Imponeer\Database\Criteria\Enum\Condition;
 use Imponeer\Database\Criteria\Enum\Order;
 use JsonException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Random\RandomException;
 
@@ -20,9 +21,8 @@ class CriteriaCompoTest extends TestCase
      * @return array<string, array{0: CriteriaCompo, 1: string|Condition}>
      *
      * @throws RandomException
-     * @throws JsonException
      */
-    final public function provideCondition(): array
+    final public static function provideCondition(): array
     {
         $testsVariations = [];
 
@@ -66,10 +66,9 @@ class CriteriaCompoTest extends TestCase
      * @param CriteriaCompo $compo Build criteria with such condition
      * @param string|Condition $condition join condition
      *
-     * @dataProvider provideCondition
-     *
      * @throws Exception
      */
+    #[DataProvider('provideCondition')]
     final public function testCondition(CriteriaCompo $compo, string|Condition $condition): void
     {
         if (is_string($condition)) {
@@ -114,7 +113,7 @@ class CriteriaCompoTest extends TestCase
      *
      * @return Generator
      */
-    final public function provideOrder(): Generator
+    final public static function provideOrder(): Generator
     {
         foreach (Order::cases() as $order) {
             yield $order->name => [$order->value];
@@ -128,9 +127,8 @@ class CriteriaCompoTest extends TestCase
      * Tests order with enums
      *
      * @param string|Order $order
-     *
-     * @dataProvider provideOrder
      */
+    #[DataProvider('provideOrder')]
     final public function testOrder(Order|string $order): void
     {
         $criteria = new CriteriaCompo();

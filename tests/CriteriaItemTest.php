@@ -7,6 +7,7 @@ use Imponeer\Database\Criteria\CriteriaItem;
 use Imponeer\Database\Criteria\Enum\ComparisonOperator;
 use Imponeer\Database\Criteria\Enum\Order;
 use JsonException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Random\RandomException;
 use stdClass;
@@ -21,7 +22,7 @@ class CriteriaItemTest extends TestCase
      * @throws RandomException
      * @throws JsonException
      */
-    final public function provideComparisonOperators(): array
+    final public static function provideComparisonOperators(): array
     {
         $column = sha1(random_int(PHP_INT_MIN, PHP_INT_MAX));
         $specialOperators = [
@@ -92,10 +93,9 @@ class CriteriaItemTest extends TestCase
      * @param mixed $value Value to use
      * @param string|ComparisonOperator $operator Comparison operator to be used for test
      *
-     * @dataProvider provideComparisonOperators
-     *
      * @throws JsonException
      */
+    #[DataProvider('provideComparisonOperators')]
     final public function testIfOperatorRendersContent(string $column, mixed $value, ComparisonOperator|string $operator): void
     {
         $criteria = new CriteriaItem($column, $value, $operator);
@@ -122,7 +122,7 @@ class CriteriaItemTest extends TestCase
      *
      * @return Generator
      */
-    final public function provideOrder(): Generator
+    final public static function provideOrder(): Generator
     {
         foreach (Order::cases() as $order) {
             yield $order->value => [$order->value];
@@ -137,10 +137,9 @@ class CriteriaItemTest extends TestCase
      *
      * @param string|Order $order
      *
-     * @dataProvider provideOrder
-     *
      * @throws RandomException
      */
+    #[DataProvider('provideOrder')]
     final public function testOrder(Order|string $order): void
     {
         $criteria = new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX)));
