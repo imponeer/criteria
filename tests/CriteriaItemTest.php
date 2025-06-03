@@ -211,7 +211,6 @@ class CriteriaItemTest extends TestCase
     {
         $faker = Factory::create();
         $criteria = new CriteriaItem($faker->sha1());
-        ;
         self::assertEmpty($criteria->getSort(), 'Default sort by is not empty');
         $sort = $faker->sha1();
         $criteria->setSort($sort);
