@@ -9,7 +9,6 @@ namespace Imponeer\Database\Criteria\Enum;
  */
 enum Condition: string
 {
-
     /**
      * Use AND
      */
@@ -24,5 +23,4 @@ enum Condition: string
      * Use XOR
      */
     case XOR = 'XOR';
-
 }

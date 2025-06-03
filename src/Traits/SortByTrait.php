@@ -9,7 +9,6 @@ namespace Imponeer\Database\Criteria\Traits;
  */
 trait SortByTrait
 {
-
     protected ?string $sort = null;
 
     /**
@@ -35,5 +34,4 @@ trait SortByTrait
 
         return $this;
     }
-
 }

@@ -11,7 +11,6 @@ use Imponeer\Database\Criteria\Enum\Order;
  */
 trait OrderByTrait
 {
-
     protected Order $order;
 
     public function __construct()
@@ -40,5 +39,4 @@ trait OrderByTrait
 
         return $this;
     }
-
 }

@@ -2,6 +2,7 @@
 
 namespace Imponeer\Tests\Database\Criteria;
 
+use Faker\Factory;
 use Generator;
 use Imponeer\Database\Criteria\CriteriaItem;
 use Imponeer\Database\Criteria\Enum\ComparisonOperator;
@@ -14,7 +15,6 @@ use stdClass;
 
 class CriteriaItemTest extends TestCase
 {
-
     /**
      * Gets all possible comparison operators enums
      *
@@ -24,7 +24,9 @@ class CriteriaItemTest extends TestCase
      */
     final public static function provideComparisonOperators(): array
     {
-        $column = sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX));
+        $faker = Factory::create();
+
+        $column = $faker->sha1();
         $specialOperators = [
             ComparisonOperator::BETWEEN->name,
             ComparisonOperator::NOT_BETWEEN->name,
@@ -33,18 +35,27 @@ class CriteriaItemTest extends TestCase
         ];
         $possibleValues = [
             null,  // null value
-            md5((string) random_int(PHP_INT_MIN, PHP_INT_MAX)),  // random string
-            random_int(PHP_INT_MIN, PHP_INT_MAX), // random int
-            mt_rand() / mt_getrandmax(), // random float
+            $faker->md5(),  // random string
+            $faker->numberBetween(PHP_INT_MIN, PHP_INT_MAX), // random int
+            $faker->randomFloat(), // random float
             true, // true
             [], // array
             new stdClass(), // class
         ];
 
         $testsVariations = [];
-        $addTestVariation = static function (string $column, mixed $value, ComparisonOperator|string $operator) use (&$testsVariations) {
-            $label = json_encode(['column' => $column, 'value' => $value, 'operator' => $operator], JSON_THROW_ON_ERROR);
-            $testsVariations[$label] = [$column, $value, $operator];
+        $addTestVariation = static function (
+            string $column,
+            mixed $value,
+            ComparisonOperator|string $operator
+        ) use (&$testsVariations) {
+            $data = [
+                'column' => $column,
+                'value' => $value,
+                'operator' => $operator,
+            ];
+            $label = json_encode($data, JSON_THROW_ON_ERROR);
+            $testsVariations[$label] = array_values($data);
         };
 
         foreach (ComparisonOperator::cases() as $operatorEnum) {
@@ -64,22 +75,33 @@ class CriteriaItemTest extends TestCase
         }
 
         foreach ([ComparisonOperator::BETWEEN, ComparisonOperator::NOT_BETWEEN] as $operatorEnum) {
-            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], $operatorEnum);
+            $range = [
+                $faker->numberBetween(PHP_INT_MIN, 0),
+                $faker->numberBetween(1, PHP_INT_MAX),
+            ];
+
+            $addTestVariation($column, $range, $operatorEnum);
             $operatorVal = $operatorEnum->value;
-            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], $operatorVal);
-            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], ' ' . $operatorVal . ' ');
-            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], strtolower($operatorVal));
-            $addTestVariation( $column, [random_int(PHP_INT_MIN, 0), random_int(1, PHP_INT_MAX)], ucfirst(strtolower($operatorVal)));
+            $addTestVariation($column, $range, $operatorVal);
+            $addTestVariation($column, $range, ' ' . $operatorVal . ' ');
+            $addTestVariation($column, $range, strtolower($operatorVal));
+            $addTestVariation($column, $range, ucfirst(strtolower($operatorVal)));
         }
 
         foreach ([ComparisonOperator::IN, ComparisonOperator::NOT_IN] as $operatorEnum) {
             foreach ($possibleValues as $value) {
-                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), $operatorEnum);
+                $inData = array_fill(
+                    0,
+                    $faker->numberBetween(1, 5),
+                    $value
+                );
+
+                $addTestVariation($column, $inData, $operatorEnum);
                 $operatorVal = $operatorEnum->value;
-                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), $operatorVal);
-                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), ' ' . $operatorVal . ' ');
-                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), strtolower($operatorVal));
-                $addTestVariation( $column, array_fill(0, random_int(1, 5), $value), ucfirst(strtolower($operatorVal)));
+                $addTestVariation($column, $inData, $operatorVal);
+                $addTestVariation($column, $inData, ' ' . $operatorVal . ' ');
+                $addTestVariation($column, $inData, strtolower($operatorVal));
+                $addTestVariation($column, $inData, ucfirst(strtolower($operatorVal)));
             }
         }
 
@@ -96,24 +118,39 @@ class CriteriaItemTest extends TestCase
      * @throws JsonException
      */
     #[DataProvider('provideComparisonOperators')]
-    final public function testIfOperatorRendersContent(string $column, mixed $value, ComparisonOperator|string $operator): void
-    {
+    final public function testIfOperatorRendersContent(
+        string $column,
+        mixed $value,
+        ComparisonOperator|string $operator
+    ): void {
         $criteria = new CriteriaItem($column, $value, $operator);
         self::assertNotEmpty(
             $criteria->render(false),
-            'Criteria with condition ' . $criteria->getComparisonOperator()->name . ' doesn\'t renders SQL (without binds)'
+            sprintf(
+                "Criteria with condition %s doesn't renders SQL (without binds)",
+                $criteria->getComparisonOperator()->name
+            )
         );
         self::assertNotEmpty(
             $criteria->renderWhere(false),
-            'Criteria with condition ' . $criteria->getComparisonOperator()->name . ' doesn\'t renders WHERE SQL (without binds)'
+            sprintf(
+                "Criteria with condition %s doesn't renders WHERE SQL (without binds)",
+                $criteria->getComparisonOperator()->name
+            )
         );
         self::assertNotEmpty(
             $criteria->render(true),
-            'Criteria with condition ' . $criteria->getComparisonOperator()->name . ' doesn\'t renders SQL (with binds)'
+            sprintf(
+                "Criteria with condition %s doesn't renders SQL (with binds)",
+                $criteria->getComparisonOperator()->name
+            )
         );
         self::assertNotEmpty(
             $criteria->renderWhere(true),
-            'Criteria with condition ' . $criteria->getComparisonOperator()->name . ' doesn\'t renders WHERE SQL (with binds)'
+            sprintf(
+                "Criteria with condition %s doesn't renders WHERE SQL (with binds)",
+                $criteria->getComparisonOperator()->name
+            )
         );
     }
 
@@ -136,13 +173,13 @@ class CriteriaItemTest extends TestCase
      * Tests order with enums
      *
      * @param string|Order $order
-     *
-     * @throws RandomException
      */
     #[DataProvider('provideOrder')]
     final public function testOrder(Order|string $order): void
     {
-        $criteria = new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX)));
+        $faker = Factory::create();
+
+        $criteria = new CriteriaItem($faker->sha1());
         self::assertSame(Order::ASC->value, $criteria->getOrder()->value, 'Default order is not correct');
         $criteria->setOrder($order);
         self::assertSame(strtoupper(trim($order)), $criteria->getOrder()->value, 'Order ' . $order . ' does\'t sets');
@@ -150,29 +187,32 @@ class CriteriaItemTest extends TestCase
 
     /**
      * Tests group by operations
-     *
-     * @throws RandomException
      */
     final public function testGroupBy(): void
     {
-        $criteria = new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX)));
+        $faker = Factory::create();
+        $criteria = new CriteriaItem($faker->sha1());
         self::assertEmpty($criteria->getGroupBy(), 'Default group by is not empty');
-        $groupBy = sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX));
+        $groupBy = $faker->sha1();
         $criteria->setGroupBy($groupBy);
         self::assertNotEmpty($criteria->getGroupBy(), 'Group by was set but value wasn\'t modified');
-        self::assertStringStartsWith('GROUP BY', trim($criteria->getGroupBy()), 'Non empty group by doesn\' starts with "GROUP BY"');
+        self::assertStringStartsWith(
+            'GROUP BY',
+            trim($criteria->getGroupBy()),
+            'Non empty group by doesn\' starts with "GROUP BY"'
+        );
         self::assertStringContainsString($groupBy, $criteria->getGroupBy(), 'Group by value doesn\'t exists');
     }
 
     /**
      * Tests sort by operations
-     * @throws RandomException
      */
     final public function testSortBy(): void
     {
-        $criteria = new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX)));
+        $faker = Factory::create();
+        $criteria = new CriteriaItem($faker->sha1());
         self::assertEmpty($criteria->getSort(), 'Default sort by is not empty');
-        $sort = sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX));
+        $sort = $faker->sha1();
         $criteria->setSort($sort);
         self::assertNotEmpty($criteria->getSort(), 'Sort by was set but value wasn\'t modified');
         self::assertStringContainsString($sort, $criteria->getSort(), 'Sort by value doesn\'t exists');
@@ -180,15 +220,15 @@ class CriteriaItemTest extends TestCase
 
     /**
      * Tests limit/from by operations
-     * @throws RandomException
      */
     final public function testPartialResults(): void
     {
-        $criteria = new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX)));
+        $faker = Factory::create();
+        $criteria = new CriteriaItem($faker->sha1());
         self::assertSame(0, $criteria->getLimit(), 'Default limit is not 0');
         self::assertSame(0, $criteria->getStart(), 'Default start is not 0');
-        $limit = random_int(1, PHP_INT_MAX);
-        $start = random_int(1, PHP_INT_MAX);
+        $limit = $faker->numberBetween(1, PHP_INT_MAX);
+        $start = $faker->numberBetween(1, PHP_INT_MAX);
         $criteria->setLimit($limit)->setStart($start);
         self::assertSame($limit, $criteria->getLimit(), 'Updated limit is not same as should be');
         self::assertSame($start, $criteria->getStart(), 'Updated start is not same as should be');
@@ -196,5 +236,4 @@ class CriteriaItemTest extends TestCase
         self::assertSame(0, $criteria->getLimit(), 'Reset limit is not 0');
         self::assertSame(0, $criteria->getStart(), 'Reset start is not 0');
     }
-
 }

@@ -12,7 +12,7 @@ final class UniqueBindParam
     /**
      * Last generated bind suffix ID
      */
-    static private int $lastGeneratedBindSuffixId = 0;
+    private static int $lastGeneratedBindSuffixId = 0;
 
     /**
      * UniqueBindParam constructor.
@@ -30,5 +30,4 @@ final class UniqueBindParam
     {
         return 'col_' . $column . '_' . (++self::$lastGeneratedBindSuffixId);
     }
-
 }

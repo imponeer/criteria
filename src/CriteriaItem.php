@@ -16,7 +16,6 @@ use Stringable;
  */
 class CriteriaItem extends CriteriaElement
 {
-
     protected ?string $prefix = null;
     protected ?string $function = null;
     protected null|string|int $column = null;
@@ -39,19 +38,18 @@ class CriteriaItem extends CriteriaElement
      * @param string|null $function
      */
     public function __construct(
-        string|int                $column,
-        mixed                     $value = null,
+        string|int $column,
+        mixed $value = null,
         ComparisonOperator|string $operator = '=',
-        ?string                   $prefix = null,
-        ?string                   $function = null
-    )
-    {
+        ?string $prefix = null,
+        ?string $function = null
+    ) {
         parent::__construct();
 
         $this->prefix = $prefix;
         $this->function = $function;
         $this->column = $column;
-        $this->operator = $operator instanceof ComparisonOperator ? $operator : ComparisonOperator::from(strtoupper(trim($operator)));
+        $this->operator = ComparisonOperator::resolve($operator);
 
         if (is_string($value) && str_starts_with($value, '(')) {
             $this->data[] = $value;
@@ -140,9 +138,17 @@ class CriteriaItem extends CriteriaElement
                 break;
             default:
                 if ($withBindVariables) {
-                    $clause .= sprintf(" %s %s", $this->operator->value, $this->prepareRenderedValue(current($this->data)));
+                    $clause .= sprintf(
+                        " %s %s",
+                        $this->operator->value,
+                        $this->prepareRenderedValue(current($this->data))
+                    );
                 } else {
-                    $clause .= sprintf(" %s :%s", $this->operator->value, key($this->data));
+                    $clause .= sprintf(
+                        " %s :%s",
+                        $this->operator->value,
+                        key($this->data)
+                    );
                 }
         }
 
@@ -172,7 +178,7 @@ class CriteriaItem extends CriteriaElement
         }
 
         if (is_object($value)) {
-            if ((interface_exists(Stringable::class) && ($value instanceof Stringable)) || method_exists($value, '__toString')) {
+            if ($value instanceof Stringable) {
                 return $this->addSlashes((string)$value);
             }
 
