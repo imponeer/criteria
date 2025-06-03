@@ -2,8 +2,6 @@
 
 namespace Imponeer\Database\Criteria\Enum;
 
-use PHPUnit\Framework\Constraint\Operator;
-
 /**
  * SQL comparison operator
  *
