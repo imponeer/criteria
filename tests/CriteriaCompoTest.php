@@ -8,7 +8,6 @@ use Imponeer\Database\Criteria\CriteriaCompo;
 use Imponeer\Database\Criteria\CriteriaItem;
 use Imponeer\Database\Criteria\Enum\Condition;
 use Imponeer\Database\Criteria\Enum\Order;
-use JsonException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Random\RandomException;
@@ -31,14 +30,14 @@ class CriteriaCompoTest extends TestCase
             foreach ([$condition, ' ' . $condition . ' ', strtolower($condition), ucfirst(strtolower($condition))] as $conditionVar) {
                 // first variant for compo
                 $compo1 = new CriteriaCompo();
-                $compo1->add(new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX))));
-                $compo1->add(new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX))), $conditionVar);
+                $compo1->add(new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX))));
+                $compo1->add(new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX))), $conditionVar);
                 $label = sprintf('Two columns with null values and condition %s', $conditionData->name);
                 $testsVariations[$label] = [$compo1, $conditionVar];
 
                 // 2nd variant for compo
-                $compo2 = new CriteriaCompo(new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX))));
-                $compo2->add(new CriteriaItem(sha1(random_int(PHP_INT_MIN, PHP_INT_MAX))), $conditionVar);
+                $compo2 = new CriteriaCompo(new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX))));
+                $compo2->add(new CriteriaItem(sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX))), $conditionVar);
                 $label = sprintf("One column with null value and condition %s", $conditionData->name);
                 $testsVariations[$label] = [$compo2, $conditionVar];
 
@@ -146,7 +145,7 @@ class CriteriaCompoTest extends TestCase
     {
         $criteria = new CriteriaCompo();
         self::assertEmpty($criteria->getGroupBy(), 'Default group by is not empty');
-        $groupBy = sha1(random_int(PHP_INT_MIN, PHP_INT_MAX));
+        $groupBy = sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX));
         $criteria->setGroupBy($groupBy);
         self::assertNotEmpty($criteria->getGroupBy(), 'Group by was set but value wasn\'t modified');
         self::assertStringStartsWith('GROUP BY', trim($criteria->getGroupBy()), 'Non empty group by doesn\' starts with "GROUP BY"');
@@ -162,7 +161,7 @@ class CriteriaCompoTest extends TestCase
     {
         $criteria = new CriteriaCompo();
         self::assertEmpty($criteria->getSort(), 'Default sort by is not empty');
-        $sort = sha1(random_int(PHP_INT_MIN, PHP_INT_MAX));
+        $sort = sha1((string) random_int(PHP_INT_MIN, PHP_INT_MAX));
         $criteria->setSort($sort);
         self::assertNotEmpty($criteria->getSort(), 'Sort by was set but value wasn\'t modified');
         self::assertStringContainsString($sort, $criteria->getSort(), 'Sort by value doesn\'t exists');

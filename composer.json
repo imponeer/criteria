@@ -28,9 +28,11 @@
     "xoops"
   ],
   "scripts": {
-    "test": "phpunit --testdox"
+    "test": "phpunit --testdox",
+    "phpstan": "phpstan analyse"
   },
   "require-dev": {
-    "phpunit/phpunit": "^12"
+    "phpunit/phpunit": "^12",
+    "phpstan/phpstan": "^2.1"
   }
 }
