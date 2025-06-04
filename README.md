@@ -21,8 +21,8 @@ Alternatively, you can manually include the files from the `src/` directory.
 Here is a basic example of how to use the Criteria library:
 
 ```php
-use Imponeer\Criteria\CriteriaItem;
-use Imponeer\Criteria\CriteriaCompo;
+use Imponeer\Database\Criteria\CriteriaItem;
+use Imponeer\Database\Criteria\CriteriaCompo;
 
 $criteria = new CriteriaCompo();
 $criteria->add(new CriteriaItem('status', 'active'));
