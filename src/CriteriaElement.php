@@ -96,6 +96,6 @@ abstract class CriteriaElement implements Stringable
      */
     public function __toString(): string
     {
-        return $this->render(true);
+        return $this->render(true) ?? '';
     }
 }
