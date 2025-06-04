@@ -2,6 +2,7 @@
 
 namespace Imponeer\Database\Criteria;
 
+use Exception;
 use Imponeer\Database\Criteria\Traits\GroupByTrait;
 use Imponeer\Database\Criteria\Traits\OrderByTrait;
 use Imponeer\Database\Criteria\Traits\PartialResultsTrait;
@@ -88,5 +89,13 @@ abstract class CriteriaElement implements Stringable
             'groupBy', 'groupby' => !empty($this->getGroupBy()),
             default => false,
         };
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function __toString(): string
+    {
+        return $this->render(true);
     }
 }

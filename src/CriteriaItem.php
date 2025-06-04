@@ -232,12 +232,4 @@ class CriteriaItem extends CriteriaElement
                 ComparisonOperator::NOT_BETWEEN,
             ], true);
     }
-
-    /**
-     * @throws JsonException
-     */
-    public function __toString(): string
-    {
-        return $this->render();
-    }
 }
