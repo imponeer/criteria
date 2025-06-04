@@ -40,7 +40,6 @@ trait PartialResultsTrait
      * Gets from what record number to return results (counting starts from 0)
      *
      * @noinspection MethodShouldBeFinalInspection
-     * @noinspection PhpDocSignatureInspection
      */
     public function getStart(): int
     {
@@ -53,7 +52,6 @@ trait PartialResultsTrait
      * @param int $start Sets start position
      *
      * @noinspection MethodShouldBeFinalInspection
-     * @noinspection PhpDocSignatureInspection
      */
     public function setStart(int $start = 0): self
     {

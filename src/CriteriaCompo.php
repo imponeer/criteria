@@ -5,7 +5,6 @@ namespace Imponeer\Database\Criteria;
 use Exception;
 use Imponeer\Database\Criteria\Enum\Condition;
 use IteratorAggregate;
-use Stringable;
 use Traversable;
 
 /**
@@ -108,13 +107,5 @@ class CriteriaCompo extends CriteriaElement implements IteratorAggregate
         }
 
         return $ret;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function __toString(): string
-    {
-        return $this->render() . 'A';
     }
 }

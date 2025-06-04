@@ -19,14 +19,14 @@ class CriteriaItemTest extends TestCase
      * Gets all possible comparison operators enums
      *
      * @return array<string, array{0: string, 1: mixed, 2: ComparisonOperator|string}>
-     * @throws RandomException
+     *
      * @throws JsonException
      */
     final public static function provideComparisonOperators(): array
     {
         $faker = Factory::create();
 
-        $column = $faker->sha1();
+        $column = 'field_' . $faker->word();
         $specialOperators = [
             ComparisonOperator::BETWEEN->name,
             ComparisonOperator::NOT_BETWEEN->name,
